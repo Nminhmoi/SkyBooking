@@ -479,6 +479,323 @@ footer .text-center {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
+/* ================== RESPONSIVE - MOBILE (max-width: 480px) ================== */
+@media (max-width: 480px) {
+  /* HERO */
+  .hero {
+    padding: 40px 0;
+    min-height: 300px;
+  }
+
+  .search-card {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  .search-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* SEARCH FORM */
+  #searchForm .col-md-3,
+  #searchForm .col-md-2,
+  #searchForm .col-md-2.d-grid {
+    width: 100%;
+  }
+
+  #searchForm .col-md-3,
+  #searchForm .col-md-2 {
+    margin-bottom: 0.75rem;
+  }
+
+  .form-label {
+    font-size: 0.85rem;
+  }
+
+  .form-control,
+  .form-select {
+    font-size: 0.9rem;
+    height: 38px;
+  }
+
+  /* PROMO SECTION */
+  .promo-card {
+    min-width: 280px;
+    max-width: 280px;
+    padding: 12px;
+  }
+
+  .promo-card img {
+    height: 140px;
+  }
+
+  .promo-card h4 {
+    font-size: 1rem;
+  }
+
+  .promo-card p {
+    font-size: 0.8rem;
+  }
+
+  .promo-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .promo-nav.prev { left: 2px; }
+  .promo-nav.next { right: 2px; }
+
+  /* NAVBAR */
+  .custom-navbar .navbar-brand {
+    font-size: 1.3rem;
+  }
+
+  .custom-navbar .nav-link {
+    font-size: 0.9rem;
+    margin: 0 4px;
+  }
+
+  /* DESTINATION CARDS */
+  .destination-card img {
+    height: 150px;
+  }
+
+  .destination-card h3 {
+    font-size: 18px;
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .destination-title span {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+
+  /* ROUTE VERTICAL */
+  .route-image img {
+    height: 200px;
+  }
+
+  .route-text h4 {
+    font-size: 1.1rem;
+  }
+
+  /* REVIEW BOX */
+  .review-box {
+    padding: 16px;
+    min-height: auto;
+    border-radius: 10px;
+  }
+
+  .review-text {
+    font-size: 0.9rem;
+  }
+
+  .stars {
+    font-size: 16px;
+  }
+
+  /* AUTH CARD */
+  .auth-card {
+    max-width: 95%;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  .auth-card h3 {
+    font-size: 1.3rem;
+  }
+
+  /* FLIGHT CARD */
+  .flight-card {
+    margin-bottom: 12px;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 30px 0 15px;
+  }
+
+  footer h5 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+
+  footer p,
+  footer a {
+    font-size: 0.85rem;
+  }
+
+  footer .d-flex.gap-2 {
+    justify-content: center;
+  }
+
+  /* SECTION HEADINGS */
+  h2, h3 {
+    font-size: 1.3rem !important;
+  }
+
+  /* SUGGESTIONS LIST */
+  .suggestions-list {
+    max-height: 250px;
+  }
+
+  .suggestion-item {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ================== RESPONSIVE - TABLET (481px to 768px) ================== */
+@media (min-width: 481px) and (max-width: 768px) {
+  /* HERO */
+  .hero {
+    padding: 50px 0;
+    min-height: 320px;
+  }
+
+  .search-card {
+    padding: 20px;
+  }
+
+  .search-card h4 {
+    font-size: 1.2rem;
+  }
+
+  /* SEARCH FORM */
+  #searchForm .row {
+    row-gap: 1rem;
+  }
+
+  .form-control,
+  .form-select {
+    font-size: 0.95rem;
+    height: 40px;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  /* PROMO SECTION */
+  .promo-card {
+    min-width: 300px;
+    max-width: 300px;
+    padding: 14px;
+  }
+
+  .promo-card img {
+    height: 150px;
+  }
+
+  .promo-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .promo-nav {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  /* NAVBAR */
+  .custom-navbar .navbar-brand {
+    font-size: 1.4rem;
+  }
+
+  .custom-navbar .nav-item.text-white {
+    font-size: 0.95rem;
+  }
+
+  /* DESTINATION CARDS */
+  .destination-card img {
+    height: 180px;
+  }
+
+  .destination-card h3 {
+    font-size: 20px;
+  }
+
+  .destination-title span {
+    font-size: 16px;
+  }
+
+  /* ROUTE VERTICAL */
+  .route-vertical {
+    margin-bottom: 2rem;
+  }
+
+  .route-image img {
+    height: 250px;
+  }
+
+  /* REVIEW BOX */
+  .review-box {
+    padding: 20px;
+  }
+
+  .review-text {
+    font-size: 0.95rem;
+  }
+
+  /* AUTH CARD */
+  .auth-card {
+    max-width: 450px;
+    margin: 60px auto;
+  }
+
+  /* SECTION HEADINGS */
+  h2, h3 {
+    font-size: 1.5rem !important;
+  }
+
+  /* GRID ADJUSTMENTS */
+  .row.g-4 > [class*='col-'] {
+    margin-bottom: 1rem;
+  }
+}
+
+/* ================== RESPONSIVE - LAPTOP/DESKTOP (769px+) ================== */
+@media (min-width: 769px) {
+  /* HERO */
+  .hero {
+    padding: 70px 0;
+    min-height: 400px;
+  }
+
+  .search-card {
+    padding: 28px;
+  }
+
+  /* PROMO SECTION */
+  .promo-card {
+    min-width: 360px;
+    max-width: 360px;
+  }
+
+  .promo-nav {
+    width: 42px;
+    height: 42px;
+  }
+
+  /* DESTINATION CARDS */
+  .destination-card img {
+    height: 220px;
+  }
+
+  /* ROUTE VERTICAL */
+  .route-image img {
+    height: 320px;
+  }
+
+  /* NAVBAR */
+  .custom-navbar .navbar-collapse {
+    justify-content: flex-end;
+  }
+}
+
 /* ================== CSS CHO AUTOCOMPLETE ================== */
 .autocomplete-wrapper {
   position: relative; /* Để danh sách con bám theo cha */
