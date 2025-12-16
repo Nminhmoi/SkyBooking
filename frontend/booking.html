@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đặt vé - SkyBook</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">SkyBook</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav ms-auto align-items-center" id="navRightArea"></ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <h3 class="mb-4">Xác nhận đặt vé</h3>
+
+  <div class="card p-4 mb-4 shadow-sm">
+    <p><strong>Chuyến bay:</strong> <span id="flightInfo" class="text-primary fw-bold"></span></p>
+    <p>Thời gian: <span id="flightTime"></span></p>
+
+    <div class="mb-3">
+      <label class="form-label">Số lượng hành khách</label>
+      <input type="number" id="ticketCount" class="form-control" readonly>
+    </div>
+
+    <p class="fs-5"><strong>Tổng tiền tạm tính:</strong> <span id="totalPrice" class="text-danger fw-bold"></span></p>
+    
+    <hr>
+    <h5>Thông tin hành khách đại diện</h5>
+    <div class="mb-3">
+      <input type="text" id="name" class="form-control mb-2" placeholder="Họ tên hành khách" required>
+      <input type="number" id="age" class="form-control mb-2" placeholder="Tuổi" required value="20">
+    </div>
+
+    <button id="payBtn" class="btn btn-success w-100 py-2">Xác nhận đặt vé</button>
+  </div>
+</div>
+
+
+<footer class="bg-dark text-white pt-5">
+  <div class="container">
+      <div class="text-center mt-3 border-top pt-3">
+      <small>© 2025 SkyBook. All rights reserved.</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+  // --- 1. Navbar & Auth Check ---
+  const navRight = document.getElementById("navRightArea");
+  const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+  const token = localStorage.getItem("token");
+
+  if(!user || !token){
+    alert("Vui lòng đăng nhập để đặt vé.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  navRight.innerHTML = `
+    <li class="nav-item d-flex align-items-center me-3 text-white">Xin chào, <strong class="ms-2">${user.name}</strong></li>
+    <li class="nav-item"><a class="nav-link text-warning fw-bold" href="mytickets.html">Vé đã đặt</a></li>
+    <li class="nav-item"><button id="logoutBtn" class="btn btn-outline-light ms-2">Đăng xuất</button></li>
+  `;
+  document.getElementById("logoutBtn").addEventListener("click", function(){
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("token");
+    window.location.href="index.html";
+  });
+
+  // --- 2. Load thông tin chuyến bay từ LocalStorage (được lưu ở trang search) ---
+  const flight = JSON.parse(localStorage.getItem("selectedFlight") || "null");
+  
+  if(!flight) {
+      alert("Chưa chọn chuyến bay!");
+      window.location.href = "index.html";
+      return;
+  }
+
+  const date = new Date(flight.startTime);
+  document.getElementById("flightInfo").innerText = `${flight.airline}: ${flight.from} ➝ ${flight.to}`;
+  document.getElementById("flightTime").innerText = date.toLocaleString('vi-VN');
+  
+  const ticketCountInput = document.getElementById("ticketCount");
+  ticketCountInput.value = flight.passengers;
+  
+  // Tính tiền
+  const totalPrice = flight.price * flight.passengers;
+  document.getElementById("totalPrice").innerText = totalPrice.toLocaleString('vi-VN') + 'đ';
+
+  // --- 3. Xử lý Đặt vé (GỌI API) ---
+  document.getElementById("payBtn").addEventListener("click", async function(){
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value.trim();
+
+    if(!name){ alert("Vui lòng điền tên hành khách."); return; }
+
+    // Tạo danh sách hành khách (Logic đơn giản: Nhân bản người đặt cho đủ số lượng)
+    // Thực tế nên có form nhập từng người. Ở đây làm nhanh.
+    const passengersList = [];
+    for(let i=0; i<flight.passengers; i++){
+        passengersList.push({ name: `${name} ${i==0?'':'(Kèm)'}`, age: Number(age) });
+    }
+
+    try {
+        const res = await fetch('http://localhost:5000/api/bookings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-token': token // Gửi token lên để xác thực
+            },
+            body: JSON.stringify({
+                flightId: flight.flightId,
+                passengers: passengersList
+            })
+        });
+
+        const data = await res.json();
+
+        if(res.status === 201 || data.success) {
+            alert("Đặt vé thành công!");
+            localStorage.removeItem("selectedFlight");
+            window.location.href = "mytickets.html";
+        } else {
+            alert(data.message || "Đặt vé thất bại!");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Lỗi kết nối Server!");
+    }
+  });
+
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

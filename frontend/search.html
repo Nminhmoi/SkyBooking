@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kết quả tìm chuyến bay | SkyBook</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<!-- navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">SkyBook</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navContent">
+      <!-- Đây là nơi JS render login/user -->
+      <ul class="navbar-nav ms-auto align-items-center" id="navRightArea"></ul>
+    </div>
+  </div>
+</nav>
+
+<!-- SEARCH SUMMARY -->
+<section class="bg-light py-3 border-bottom">
+  <div class="container">
+    <div id="searchSummary" class="fw-semibold"></div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="py-4">
+  <div class="container">
+    <div class="row">
+
+      <!-- LEFT FILTER (mock UI giống Traveloka) -->
+      <aside class="col-md-3 mb-4">
+        <div class="card p-3">
+          <h6 class="fw-bold mb-3">Bộ lọc</h6>
+
+          <div class="mb-3">
+            <label class="form-label">Hãng bay</label>
+            <select id="airlineFilter" class="form-select">
+              <option value="">Tất cả</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Sắp xếp</label>
+            <select id="sortPrice" class="form-select">
+              <option value="">Mặc định</option>
+              <option value="asc">Giá tăng dần</option>
+              <option value="desc">Giá giảm dần</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RESULTS -->
+      <section class="col-md-9">
+        <div id="results" class="d-flex flex-column gap-3"></div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-dark text-white pt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h5>SkyBook</h5>
+        <p>Đặt vé máy bay dễ dàng, nhanh chóng và tiện lợi.</p>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <h5>Liên kết</h5>
+        <ul class="list-unstyled">
+          <li><a class="text-decoration-none" href="index.html">Trang chủ</a></li>
+          <li><a class="text-decoration-none" href="mytickets.html">Vé đã đặt</a></li>
+          <li><a class="text-decoration-none" href="login.html">Đăng nhập</a></li>
+          <li><a class="text-decoration-none" href="register.html">Đăng ký</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <h5>Liên hệ</h5>
+        <p>Email: support@skybook.vn</p>
+        <p>Hotline: 1900 1234</p>
+        <div class="d-flex gap-2 mt-2">
+            <a href="#" class="fs-5 facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="fs-5 twitter"><i class="bi bi-twitter"></i></a>
+            <a href="#" class="fs-5 instagram"><i class="bi bi-instagram"></i></a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="text-center mt-3 border-top pt-3">
+      <small>© 2025 SkyBook. All rights reserved.</small>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/search.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyBook — Tìm chuyến bay</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<!-- navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-navbar shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="index.html">SkyBook</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navContent">
+      <!-- Đây là nơi JS render login/user -->
+      <ul class="navbar-nav ms-auto align-items-center" id="navRightArea"></ul>
+    </div>
+  </div>
+</nav>
+
+
+<!-- HERO / SEARCH -->
+<header class="hero py-5">
+  <div class="container">
+    <div class="search-card mx-auto p-4">
+      <h4 class="text-white mb-3">Tìm chuyến bay</h4>
+      <form id="searchForm" class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small text-white">Từ</label>
+          <div class="autocomplete-wrapper">
+            <input id="from" class="form-control" placeholder="Thành phố, sân bay" autocomplete="off">
+            <ul id="suggestions-from" class="suggestions-list"></ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-white">Đến</label>
+          <div class="autocomplete-wrapper">
+            <input id="to" class="form-control" placeholder="Thành phố, sân bay" autocomplete="off">
+            <ul id="suggestions-to" class="suggestions-list"></ul>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-white">Ngày</label>
+          <input id="depart" type="date" class="form-control">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small text-white">Số hành khách</label>
+          <input id="passengers" type="number" min="1" value="1" class="form-control">
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="submit" class="btn btn-primary">Tìm chuyến</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</header>
+
+
+<section class="promo-section py-5">
+  <h2 class="text-center mb-4 fw-bold">Ưu đãi nổi bật</h2>
+
+  <div class="promo-wrap">
+    <button class="promo-nav prev" aria-label="Prev">‹</button>
+    <div class="promo-scroll" id="promoScroll">
+          <!-- nhiều card hơn hoặc rộng hơn để bắt buộc overflow -->
+    <div class="promo-card"><img src="https://etrip4utravel.s3-ap-southeast-1.amazonaws.com/images/article/2025/10/98692711-859e-4f54-9551-202e7fc0f620.jpg"><h4>Giảm 40% Tết 2025</h4><p>Ưu đãi toàn bộ chuyến bay nội địa.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
+
+    <div class="promo-card"><img src="https://etrip4utravel.s3-ap-southeast-1.amazonaws.com/images/article/2025/10/98692711-859e-4f54-9551-202e7fc0f620.jpg"><h4>Vé quốc tế siêu rẻ</h4><p>Giảm đến 35% cho tuyến châu Á.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
+
+    <div class="promo-card"><img src="https://etrip4utravel.s3-ap-southeast-1.amazonaws.com/images/article/2025/10/98692711-859e-4f54-9551-202e7fc0f620.jpg"><h4>Ưu đãi mùa hè</h4><p>Du lịch tự do – giá siêu tiết kiệm.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
+
+    <div class="promo-card"><img src="https://etrip4utravel.s3-ap-southeast-1.amazonaws.com/images/article/2025/10/98692711-859e-4f54-9551-202e7fc0f620.jpg"><h4>Combo khách sạn</h4><p>Tiết kiệm khi đặt cùng khách sạn.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
+
+    <div class="promo-card"><img src="https://etrip4utravel.s3-ap-southeast-1.amazonaws.com/images/article/2025/10/98692711-859e-4f54-9551-202e7fc0f620.jpg"><h4>Flash Sale</h4><p>Giờ vàng mỗi ngày.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
+
+    </div>
+    <button class="promo-nav next" aria-label="Next">›</button>
+  </div>
+</section>
+
+
+
+
+
+<!-- Tuyến bay phổ biến -->
+<section class="popular-routes-vertical py-5 bg-light">
+  <div class="container">
+    <h3 class="fw-bold text-center mb-5">Tuyến bay phổ biến</h3>
+
+    <!-- ROUTE ITEM -->
+    <div class="route-vertical mb-5">
+      <div class="route-text text-center mb-3">
+        <h4>Hà Nội → TP.HCM</h4>
+        <p class="text-muted mb-1">Giá chỉ từ <strong>1.200.000đ</strong></p>
+        <p class="small text-muted">
+          Tuyến bay nhộn nhịp nhất Việt Nam, nhiều chuyến mỗi ngày, phù hợp công tác & du lịch.
+        </p>
+        <a href="search.html" class="btn btn-primary btn-sm">Đặt vé ngay</a>
+      </div>
+
+      <div class="route-image">
+        <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/webbanner21671769085485-1695094886938.webp" alt="Hà Nội đi TP.HCM">
+      </div>
+    </div>
+
+    <!-- ROUTE ITEM -->
+    <div class="route-vertical mb-5">
+      <div class="route-text text-center mb-3">
+        <h4>TP.HCM → Đà Nẵng</h4>
+        <p class="text-muted mb-1">Giá chỉ từ <strong>900.000đ</strong></p>
+        <p class="small text-muted">
+          Thành phố biển năng động, phù hợp nghỉ dưỡng, du lịch gia đình.
+        </p>
+        <a href="search.html" class="btn btn-primary btn-sm">Đặt vé ngay</a>
+      </div>
+
+      <div class="route-image">
+        <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/webbanner21671769085485-1695094886938.webp" alt="TP.HCM đi Đà Nẵng">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- Điểm du lịch nổi bật -->
+<section class="destinations-section py-5">
+  <div class="container">
+
+    <div class="destination-title mb-4">
+      <span>Điểm đến hấp dẫn</span>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="destination-card">
+          <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/quangbinhvi1621704971898-1695095145079.webp" alt="Quảng Bình">
+          <h3>Quảng Bình</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="destination-card">
+          <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/gialaivi1621704971875-1695095151485.webp" alt="Gia Lai">
+          <h3>Gia Lai</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="destination-card">
+          <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/phuquocvi1621704971895-1695095158881.webp" alt="Phú Quốc">
+          <h3>Phú Quốc</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="destination-card">
+          <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/thanhhoavi1624007210031-1695095164116.webp" alt="Thanh Hoá">
+          <h3>Thanh Hoá</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="destination-card">
+          <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/ngheanvi1621705324180-1695095172011.webp" alt="Nghệ An">
+          <h3>Nghệ An</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="destination-card">
+          <img src="https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/hanoivi1621705324176-1695095180263.webp" alt="Hà Nội">
+          <h3>Hà Nội</h3>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- CUSTOMER REVIEWS -->
+<section class="reviews-section py-5">
+  <div class="container">
+    <h3 class="text-center mb-4 fw-bold">Đánh giá từ khách hàng</h3>
+
+    <div class="row g-4">
+
+      <div class="col-md-4">
+        <div class="review-box p-4">
+          <p class="review-text">"Đặt vé nhanh chóng, giá tốt và thanh toán tiện lợi. Sẽ tiếp tục ủng hộ!"</p>
+          <h6 class="mt-3 mb-1">— thg ngu 1</h6>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="review-box p-4">
+          <p class="review-text">"Giao diện dễ dùng, tìm chuyến bay rất nhanh. Dịch vụ tuyệt vời."</p>
+          <h6 class="mt-3 mb-1">— thg ngu 2</h6>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="review-box p-4">
+          <p class="review-text">"Support phản hồi nhanh, cực kỳ hài lòng. Sẽ giới thiệu cho bạn bè."</p>
+          <h6 class="mt-3 mb-1">— thg ngu 3</h6>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="review-box p-4">
+          <p class="review-text">"Support phản hồi nhanh, cực kỳ hài lòng. Sẽ giới thiệu cho bạn bè."</p>
+          <h6 class="mt-3 mb-1">— thg ngu 3</h6>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="review-box p-4">
+          <p class="review-text">"Support phản hồi nhanh, cực kỳ hài lòng. Sẽ giới thiệu cho bạn bè."</p>
+          <h6 class="mt-3 mb-1">— thg ngu 3</h6>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="review-box p-4">
+          <p class="review-text">"Support phản hồi nhanh, cực kỳ hài lòng. Sẽ giới thiệu cho bạn bè."</p>
+          <h6 class="mt-3 mb-1">— thg ngu 3</h6>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Vì sao chọn -->
+<section class="why-us py-5 bg-light">
+  <div class="container text-center">
+    <h3 class="fw-bold mb-4">Vì sao chọn SkyBook?</h3>
+    <div class="row g-4">
+      <div class="col-md-3">
+        <i class="bi bi-tags fs-1 text-primary"></i>
+        <h6 class="mt-2">Giá tốt</h6>
+        <p class="small">So sánh giá từ nhiều hãng</p>
+      </div>
+      <div class="col-md-3">
+        <i class="bi bi-shield-check fs-1 text-primary"></i>
+        <h6 class="mt-2">An toàn</h6>
+        <p class="small">Thanh toán bảo mật</p>
+      </div>
+      <div class="col-md-3">
+        <i class="bi bi-headset fs-1 text-primary"></i>
+        <h6 class="mt-2">Hỗ trợ 24/7</h6>
+        <p class="small">Luôn sẵn sàng hỗ trợ</p>
+      </div>
+      <div class="col-md-3">
+        <i class="bi bi-arrow-repeat fs-1 text-primary"></i>
+        <h6 class="mt-2">Đổi vé dễ dàng</h6>
+        <p class="small">Chính sách linh hoạt</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer class="bg-dark text-white pt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <h5>SkyBook</h5>
+        <p>Đặt vé máy bay dễ dàng, nhanh chóng và tiện lợi.</p>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <h5>Liên kết</h5>
+        <ul class="list-unstyled">
+          <li><a class="text-decoration-none" href="index.html">Trang chủ</a></li>
+          <li><a class="text-decoration-none" href="mytickets.html">Vé đã đặt</a></li>
+          <li><a class="text-decoration-none" href="login.html">Đăng nhập</a></li>
+          <li><a class="text-decoration-none" href="register.html">Đăng ký</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <h5>Liên hệ</h5>
+        <p>Email: support@skybook.vn</p>
+        <p>Hotline: 1900 1234</p>
+        <div class="d-flex gap-2 mt-2">
+            <a href="#" class="fs-5 facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="fs-5 twitter"><i class="bi bi-twitter"></i></a>
+            <a href="#" class="fs-5 instagram"><i class="bi bi-instagram"></i></a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="text-center mt-3 border-top pt-3">
+      <small>© 2025 SkyBook. All rights reserved.</small>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SLIDER DRAG SCROLL FIXED -->
+<script>
+  const slider = document.querySelector(".promo-scroll");
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  slider.addEventListener("mousedown", (e) => {
+    isDown = true;
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+  });
+
+  slider.addEventListener("mouseleave", () => isDown = false);
+  slider.addEventListener("mouseup", () => isDown = false);
+
+  slider.addEventListener("mousemove", (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    slider.scrollLeft = scrollLeft - (x - startX) * 1.6;
+  });
+</script>
+<script>
+  const scrollEl = document.getElementById('promoScroll');
+  document.querySelector('.promo-nav.next').addEventListener('click', ()=> {
+    scrollEl.scrollBy({ left: 360+22, behavior:'smooth' }); // scroll 1 card width
+  });
+  document.querySelector('.promo-nav.prev').addEventListener('click', ()=> {
+    scrollEl.scrollBy({ left: -(360+22), behavior:'smooth' });
+  });
+</script>
+
+</body>
+</html>

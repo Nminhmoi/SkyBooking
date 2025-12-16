@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng nhập - SkyBook</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-light">
+
+<div class="auth-card">
+  <h3>Đăng nhập</h3>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required class="mb-3 form-control">
+    <input type="password" id="password" placeholder="Mật khẩu" required class="mb-3 form-control">
+    <button type="submit" class="btn btn-success w-100">Đăng nhập</button>
+  </form>
+  <p>Chưa có tài khoản? <a href="register.html">Đăng ký</a></p>
+</div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) { // Backend trả về success: true
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("loggedInUser", JSON.stringify(data.data)); // data.data chứa info user
+
+      alert("Đăng nhập thành công!");
+      window.location.href = "index.html";
+    } else {
+      alert(data.message || "Sai thông tin đăng nhập!");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Không thể kết nối tới Server!");
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+/* ================== RESET ================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* ================== HERO ================== */
+.hero {
+  position: relative;
+  padding: 70px 0;
+
+  background:
+    linear-gradient(135deg, rgba(145, 107, 110, 0.65), rgba(42, 176, 255, 0.65)),
+    url('https://hoanghamobile.com/tin-tuc/wp-content/uploads/2024/06/hinh-anh-may-bay.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  min-height: 380px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #fff;
+  text-align: center;
+}
+
+.search-card {
+  background: rgba(0, 0, 0, 0.45);
+  padding: 28px;
+  border-radius: 14px;
+  max-width: 900px;
+  backdrop-filter: blur(4px);
+}
+
+/* ================== AUTH CARD ================== */
+.auth-card {
+  max-width: 400px;
+  margin: 80px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.auth-card input {
+  height: 45px;
+  border-radius: 8px;
+  padding-left: 12px;
+}
+
+.auth-card button {
+  height: 45px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+/* ================== PROMO: FORCE HORIZONTAL SCROLL ================== */
+.promo-section { 
+  background:#fff; 
+  padding:50px 0; 
+}
+
+.promo-wrap { 
+  position: relative; 
+}
+
+.promo-scroll {
+  display: flex;
+  gap: 22px;
+  overflow-x: hidden; /* ẩn scroll ngang, không cho kéo */
+  padding: 12px 20px 18px;
+  scroll-behavior: smooth;
+}
+
+.promo-card {
+  min-width: 360px;
+  max-width: 360px;
+  background:#f8f9ff;
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.12);
+  text-align:center;
+  flex-shrink:0;
+  transition: transform .18s ease;
+  overflow: hidden; /* ẩn phần ảnh tràn */
+}
+.promo-card:hover { 
+  transform: translateY(-6px); 
+}
+
+
+.promo-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover; /* ảnh lấp đầy khung, giữ tỉ lệ */
+  object-position: center top; /* căn phần quan trọng ở trên nếu cần */
+  border-radius: 8px;
+  display: block;
+}
+
+
+
+.promo-card h4 { 
+  font-size:18px; 
+  margin:6px 0; 
+}
+
+.promo-card p { 
+  color:#444; 
+  font-size:14px; 
+  margin-bottom:12px; 
+}
+
+/* ================== PROMO NAV BUTTONS ================== */
+.promo-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px; 
+  height: 42px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.2); /* ô vuông mờ mặc định */
+  color: #000; /* mũi tên đen rõ */
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  z-index: 10;
+  transition: background 0.3s;
+}
+
+/* Khi hover hoặc active (chạm vào), ô vuông chuyển sang trắng mờ */
+.promo-nav:hover,
+.promo-nav:active {
+  background: rgba(255,255,255,0.5);
+}
+
+.promo-nav.prev { left: 6px; }
+.promo-nav.next { right: 6px; }
+
+.promo-nav:focus { outline: none; }
+
+
+/* ================== REVIEW SLIDER ================== */
+.reviews-section {
+  padding: 60px 0;
+  /* background: #eef4ff; */
+}
+
+.review-slider {
+  max-width: 700px;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+  height: 220px;
+}
+
+.review-item {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all 0.6s ease;
+}
+
+.review-item.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.review-box {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  border-left: 4px solid #0a4eff;
+  min-height: 180px;
+}
+
+.review-text {
+  font-style: italic;
+  color: #444;
+}
+
+.stars {
+  color: #ffc107;
+  font-size: 20px;
+}
+
+/* ================== FOOTER ================== */
+footer {
+  background: linear-gradient(135deg, #1a2238, #12182b);
+  color: #fff;
+  padding: 60px 0 30px;
+  font-family: 'Arial', sans-serif;
+}
+
+footer h5 {
+  color: #ffcc00;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+footer h5::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 2px;
+  background: #ffcc00;
+  margin-top: 5px;
+  border-radius: 2px;
+}
+
+footer a {
+  color: #ccc;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+footer a:hover {
+  color: #ffcc00;
+  transform: translateX(5px);
+}
+
+/* ================== SOCIAL ICONS ================== */
+footer .facebook,
+footer .twitter,
+footer .instagram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2a314e;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+footer .facebook:hover {
+  background-color: #1877F2;
+  color: #fff;
+  transform: translateY(-5px) scale(1.1);
+}
+
+footer .twitter:hover {
+  background-color: #1DA1F2;
+  color: #fff;
+  transform: translateY(-5px) scale(1.1);
+}
+
+footer .instagram:hover {
+  background-color: #E4405F;
+  color: #fff;
+  transform: translateY(-5px) scale(1.1);
+}
+
+/* ================== COPYRIGHT ================== */
+footer .text-center {
+  border-top: 1px solid #444;
+  padding-top: 15px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #bbb;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 768px){
+  footer .row {
+    text-align: center;
+  }
+
+  footer .d-flex.gap-2 {
+    justify-content: center;
+  }
+}
+
+
+/* ================== SEARCH PAGE ================== */
+
+.flight-card {
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.flight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.airline {
+  font-weight: 600;
+}
+
+.price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+/* Destinations */
+
+/* .destinations-section {
+  background: linear-gradient(135deg, #eef1ff, #f9faff);
+} */
+
+.destination-title span {
+  display: inline-block;
+  padding: 10px 22px;
+  background: linear-gradient(to right, #ff0000, #ffb000);
+  color: white;
+  font-weight: bold;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+.destination-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.destination-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform .4s ease;
+}
+
+.destination-card:hover img {
+  transform: scale(1.1);
+}
+
+.destination-card h3 {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  text-shadow: 0 2px 10px rgba(0,0,0,.7);
+}
+
+
+
+/* Tuyến bay phổ biến */
+/* .popular-routes-vertical {
+  background: linear-gradient(135deg, #f4f6ff, #ffffff);
+} */
+
+.route-vertical {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.route-text h4 {
+  font-weight: 700;
+}
+
+.route-image img {
+  width: 100%;
+  height: 320px;   /* làm ảnh dài */
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.15);
+}
+
+
+
+/* ================== COMMON SECTION BACKGROUND ================== */
+.section-soft {
+  background: linear-gradient(135deg, #f4f6ff, #ffffff);
+}
+
+.section-light {
+  background: #ffffff;
+}
+
+
+
+/* ================== NAVBAR ================== */
+.custom-navbar {
+  background: linear-gradient(135deg, #1a2238, #12182b);
+  padding: 12px 0;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.custom-navbar .navbar-brand {
+  font-size: 1.6rem;
+  color: #ffcc00;
+  transition: color 0.3s;
+}
+
+.custom-navbar .navbar-brand:hover {
+  color: #ffd633;
+}
+
+/* ================== NAV LINKS ================== */
+.custom-navbar .nav-link {
+  color: #ccc;
+  margin: 0 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.custom-navbar .nav-link::after {
+  content: '';
+  display: block;
+  height: 2px;
+  width: 0;
+  background: #ffcc00;
+  transition: width 0.3s;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.custom-navbar .nav-link:hover {
+  color: #ffcc00;
+}
+
+.custom-navbar .nav-link:hover::after {
+  width: 100%;
+}
+
+/* ================== BUTTON REGISTER ================== */
+.custom-navbar .btn-register {
+  background: #ffcc00;
+  color: #1a2238 !important;
+  border-radius: 6px;
+  padding: 6px 16px;
+  margin-left: 8px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.custom-navbar .btn-register:hover {
+  background: #ffd633;
+  color: #1a2238 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+/* ================== USER LOGIN DISPLAY ================== */
+.custom-navbar .nav-item.text-white {
+  color: #ccc !important; /* chữ "Xin chào" màu xám */
+}
+
+.custom-navbar .nav-item.text-white strong {
+  color: #fff; /* màu tên user */
+}
+
+.custom-navbar #logoutBtn {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+}
+
+/* ================== RESPONSIVE TOGGLE ================== */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.85)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* ================== CSS CHO AUTOCOMPLETE ================== */
+.autocomplete-wrapper {
+  position: relative; /* Để danh sách con bám theo cha */
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none; /* Mặc định ẩn */
+  list-style: none;
+  padding: 0;
+  margin-top: 5px;
+}
+
+.suggestions-list.show {
+  display: block; /* Hiện khi có class show */
+}
+
+.suggestion-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background-color: #f5faff; /* Màu nền khi di chuột vào */
+}
+
+.suggestion-icon {
+  color: #6c757d;
+  font-size: 1.2rem;
+}
+
+.suggestion-info strong {
+  display: block;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.suggestion-info small {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.suggestion-code {
+  margin-left: auto;
+  font-weight: bold;
+  color: #666;
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Đăng ký - SkyBook</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-light">
+
+<div class="auth-card">
+  <h3>Đăng ký</h3>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Họ và tên" required class="mb-3 form-control">
+    <input type="email" id="email" placeholder="Email" required class="mb-3 form-control">
+    <input type="password" id="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required class="mb-3 form-control">
+    <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+  </form>
+  <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+</div>
+
+<script>
+document.getElementById("registerForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+  
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Lưu token vào máy
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("loggedInUser", JSON.stringify(data.data));
+      
+      alert("Đăng ký thành công!");
+      window.location.href = "index.html";
+    } else {
+      alert(data.message || "Đăng ký thất bại");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Lỗi kết nối Server!");
+  }
+});
+</script>
+</body>
+</html>
