@@ -37,7 +37,8 @@ app.use('/api', limiter);
 // Đảm bảo tên file trong thư mục routes khớp với tên require bên dưới
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bookings', require('./routes/booking')); 
-app.use('/api/flights', require('./routes/flights')); // Lưu ý: 'flights' (số nhiều)
+app.use('/api/flights', require('./routes/flights'));
+app.use('/api/reviews', require('./routes/reviews'));
 
 // Default Route (Test server)
 app.get('/', (req, res) => {

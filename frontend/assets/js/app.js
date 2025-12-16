@@ -162,4 +162,106 @@ document.addEventListener("DOMContentLoaded", function () {
   setupAutocomplete("to", "suggestions-to");
 
   /* ========== KẾT THÚC AUTOCOMPLETE ========== */
+
+  /* ========== 4. XỬ LÝ BÌNH LUẬN (REVIEWS) ========== */
+  const reviewListEl = document.getElementById("reviewList");
+  const reviewFormContainer = document.getElementById("reviewFormContainer");
+  const reviewForm = document.getElementById("reviewForm");
+  
+  // 1. Kiểm tra đăng nhập để hiện Form
+  const user = getLoggedUser();
+  const token = localStorage.getItem("token");
+
+  if (user && token && reviewFormContainer) {
+    reviewFormContainer.style.display = "block"; // Hiện form nếu đã đăng nhập
+  }
+
+  // 2. Hàm render sao (1 -> ★, 5 -> ★★★★★)
+  function renderStars(rating) {
+    let stars = "";
+    for (let i = 0; i < 5; i++) {
+      if (i < rating) stars += '<i class="bi bi-star-fill text-warning"></i>';
+      else stars += '<i class="bi bi-star text-muted"></i>';
+    }
+    return stars;
+  }
+
+  // 3. Load danh sách bình luận từ API
+  async function loadReviews() {
+    if (!reviewListEl) return;
+    try {
+      const res = await fetch('http://localhost:5000/api/reviews');
+      const data = await res.json();
+
+      if (data.success) {
+        reviewListEl.innerHTML = "";
+        if(data.data.length === 0) {
+            reviewListEl.innerHTML = '<p class="text-center text-muted w-100">Chưa có đánh giá nào.</p>';
+            return;
+        }
+
+        data.data.forEach(r => {
+          const div = document.createElement("div");
+          div.className = "col-md-4";
+          div.innerHTML = `
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body p-4">
+                <div class="mb-2">${renderStars(r.rating)}</div>
+                <p class="card-text text-secondary">"${r.comment}"</p>
+                <div class="d-flex align-items-center mt-3">
+                  <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                    ${r.user ? r.user.name.charAt(0).toUpperCase() : '?'}
+                  </div>
+                  <div class="ms-3">
+                    <h6 class="mb-0 fw-bold">${r.user ? r.user.name : 'Người dùng ẩn danh'}</h6>
+                    <small class="text-muted" style="font-size: 0.8rem">${new Date(r.createdAt).toLocaleDateString('vi-VN')}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          reviewListEl.appendChild(div);
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Gọi hàm load khi trang tải xong
+  loadReviews();
+
+  // 4. Xử lý Gửi bình luận
+  if (reviewForm) {
+    reviewForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+      
+      const rating = document.getElementById("ratingInput").value;
+      const comment = document.getElementById("commentInput").value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/reviews', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': token
+          },
+          body: JSON.stringify({ rating, comment })
+        });
+
+        const data = await res.json();
+        
+        if (data.success) {
+          alert("Cảm ơn bạn đã đánh giá!");
+          reviewForm.reset();
+          loadReviews(); // Tải lại danh sách để hiện bình luận mới
+        } else {
+          alert(data.message || "Lỗi khi gửi đánh giá");
+        }
+      } catch (err) {
+        alert("Lỗi kết nối Server");
+      }
+    });
+  }
+  /* ========== KẾT THÚC REVIEWS ========== */
 });
