@@ -166,15 +166,23 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ========== 4. XỬ LÝ BÌNH LUẬN (REVIEWS) ========== */
   const reviewListEl = document.getElementById("reviewList");
   const reviewFormContainer = document.getElementById("reviewFormContainer");
+  const loginWarning = document.getElementById("loginWarning"); // Lấy thẻ thông báo
   const reviewForm = document.getElementById("reviewForm");
   
-  // 1. Kiểm tra đăng nhập để hiện Form
+  // --- LOGIC ẨN/HIỆN FORM ---
   const user = getLoggedUser();
   const token = localStorage.getItem("token");
 
-  if (user && token && reviewFormContainer) {
-    reviewFormContainer.style.display = "block"; // Hiện form nếu đã đăng nhập
+  if (user && token) {
+    // Nếu đã đăng nhập
+    if (reviewFormContainer) reviewFormContainer.style.display = "block"; // Hiện form
+    if (loginWarning) loginWarning.style.display = "none"; // Ẩn thông báo "Vui lòng đăng nhập"
+  } else {
+    // Nếu chưa đăng nhập
+    if (reviewFormContainer) reviewFormContainer.style.display = "none"; // Ẩn form
+    if (loginWarning) loginWarning.style.display = "block"; // Hiện thông báo
   }
+  // --------------------------
 
   // 2. Hàm render sao (1 -> ★, 5 -> ★★★★★)
   function renderStars(rating) {
