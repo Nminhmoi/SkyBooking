@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-light">
 
@@ -35,6 +36,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Hàm hiển thị thông báo "Tính năng đang phát triển"
+// Phải gán vào window để nút bấm HTML gọi được
+window.showPrintFeature = function() {
+    Swal.fire({
+        icon: 'info',
+        title: 'Tính năng đang phát triển',
+        text: 'Chức năng in vé điện tử sẽ sớm được cập nhật trong phiên bản tới!',
+        confirmButtonText: 'Đã hiểu',
+        confirmButtonColor: '#3085d6'
+    });
+};
+
 document.addEventListener("DOMContentLoaded", async function(){
   
   // 1. Check Login
@@ -43,8 +56,14 @@ document.addEventListener("DOMContentLoaded", async function(){
   const navRight = document.getElementById("navRightArea");
 
   if(!user || !token){
-    alert("Vui lòng đăng nhập!");
-    window.location.href = "login.html";
+    Swal.fire({
+        icon: 'warning',
+        title: 'Chưa đăng nhập',
+        text: 'Vui lòng đăng nhập để xem vé!',
+        confirmButtonText: 'Đăng nhập ngay'
+    }).then((result) => {
+        if (result.isConfirmed) window.location.href = "login.html";
+    });
     return;
   }
 
@@ -74,38 +93,16 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     const resData = await res.json();
     
-    console.log("Status:", res.status);
-    console.log("Dữ liệu Server trả về:", resData); 
-
-    // Nếu response không thành công
-    if(!res.ok) {
-        console.error("Lỗi API:", res.status, resData);
-        ticketListEl.innerHTML = `<div class="col-12">
-            <div class="alert alert-danger text-center">
-                <strong>Lỗi Backend (${res.status}):</strong><br>${resData.message || 'Không có thông tin lỗi'}
-            </div>
-        </div>`;
-        return;
-    }
-
-    // --- SỬA LẠI ĐOẠN LẤY DỮ LIỆU ---
-    // Kiểm tra xem dữ liệu nằm ở 'resData' hay 'resData.data'
+    // Xử lý dữ liệu trả về
     let tickets = [];
-    
     if (Array.isArray(resData)) {
-        tickets = resData; // Trường hợp trả về mảng trực tiếp
+        tickets = resData;
     } else if (resData.data && Array.isArray(resData.data)) {
-        tickets = resData.data; // Trường hợp trả về object { success: true, data: [...] }
+        tickets = resData.data;
     } else {
-        console.error("Không tìm thấy danh sách vé!", resData);
-        ticketListEl.innerHTML = `<div class="col-12">
-            <div class="alert alert-danger text-center">
-                <strong>Lỗi:</strong> Không tìm thấy danh sách vé từ Server
-            </div>
-        </div>`;
+        ticketListEl.innerHTML = `<div class="col-12"><div class="alert alert-danger text-center">Lỗi tải dữ liệu vé</div></div>`;
         return;
     }
-    // ---
 
     // Nếu danh sách rỗng
     if(tickets.length === 0) {
@@ -121,17 +118,12 @@ document.addEventListener("DOMContentLoaded", async function(){
 
     // Map qua danh sách tickets
     ticketListEl.innerHTML = tickets.map(ticket => {
-        // Kiểm tra xem có thông tin chuyến bay không (đề phòng db lỗi)
-        if (!ticket.flight) {
-            console.warn("Vé thiếu thông tin flight:", ticket);
-            return '';
-        }
+        if (!ticket.flight) return '';
 
         const flight = ticket.flight;
         const bookingDate = new Date(ticket.bookingDate).toLocaleDateString('vi-VN');
         const flightTime = new Date(flight.startTime).toLocaleString('vi-VN');
         
-        // Xử lý trạng thái và bookingCode (tránh lỗi undefined)
         const code = ticket.bookingCode || 'SKY-???';
         let statusBadge = '<span class="badge bg-success">Đã thanh toán</span>';
         if(ticket.status === 'pending') statusBadge = '<span class="badge bg-warning text-dark">Chờ thanh toán</span>';
@@ -162,7 +154,8 @@ document.addEventListener("DOMContentLoaded", async function(){
                         <div class="col-md-3 text-center mt-3 mt-md-0">
                             <p class="text-muted small mb-1">Tổng tiền</p>
                             <h5 class="text-danger fw-bold">${(flight.price * ticket.passengers.length).toLocaleString('vi-VN')}đ</h5>
-                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="alert('Tính năng in vé đang phát triển!')">
+                            
+                            <button class="btn btn-sm btn-outline-primary mt-2" onclick="showPrintFeature()">
                                 <i class="bi bi-printer"></i> In vé
                             </button>
                         </div>
@@ -177,13 +170,8 @@ document.addEventListener("DOMContentLoaded", async function(){
     }).join('');
 
   } catch (err) {
-    console.error("Lỗi fetch:", err);
-    ticketListEl.innerHTML = `<div class="col-12">
-        <div class="alert alert-danger text-center">
-            <strong>Lỗi kết nối Server!</strong><br>
-            ${err.message}
-        </div>
-    </div>`;
+    console.error("Lỗi:", err);
+    Swal.fire('Lỗi', 'Không thể kết nối đến Server', 'error');
   }
 
 });

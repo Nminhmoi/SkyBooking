@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 
@@ -135,8 +136,14 @@ document.addEventListener("DOMContentLoaded", function(){
   const token = localStorage.getItem("token");
 
   if(!user || !token){
-    alert("Vui lòng đăng nhập để đặt vé.");
-    window.location.href = "login.html";
+    Swal.fire({
+        icon: 'warning',
+        title: 'Chưa đăng nhập',
+        text: 'Vui lòng đăng nhập để tiếp tục đặt vé!',
+        confirmButtonText: 'Đăng nhập ngay'
+    }).then((result) => {
+        if (result.isConfirmed) window.location.href = "login.html";
+    });
     return;
   }
 
@@ -155,8 +162,12 @@ document.addEventListener("DOMContentLoaded", function(){
   // --- 2. LOAD THÔNG TIN VÉ ---
   const flight = JSON.parse(localStorage.getItem("selectedFlight") || "null");
   if(!flight) {
-      alert("Chưa chọn chuyến bay!");
-      window.location.href = "index.html";
+      Swal.fire({
+          icon: 'error',
+          title: 'Lỗi',
+          text: 'Chưa chọn chuyến bay!',
+          confirmButtonText: 'Về trang chủ'
+      }).then(() => window.location.href = "index.html");
       return;
   }
 
@@ -176,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function(){
   const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
   let bookingData = {}; 
 
-  // --- CẤU HÌNH TÀI KHOẢN --
+  // --- CẤU HÌNH TÀI KHOẢN ---
   const BANK_CONFIG = {
     "MB": {
         bin: "MB",           
@@ -199,33 +210,34 @@ document.addEventListener("DOMContentLoaded", function(){
     const age = document.getElementById("age").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
-    const bankSelected = document.getElementById("bankSelect").value; // Lấy ngân hàng user chọn
+    const bankSelected = document.getElementById("bankSelect").value; 
 
-    if(!name || !email || !phone){ alert("Vui lòng điền đầy đủ thông tin liên hệ."); return; }
+    if(!name || !email || !phone){ 
+        Swal.fire({
+            icon: 'warning',
+            title: 'Thiếu thông tin',
+            text: 'Vui lòng điền đầy đủ Họ tên, Email và SĐT!'
+        });
+        return; 
+    }
 
     const orderId = "SKY" + Math.floor(Math.random() * 10000);
 
-    // XỬ LÝ QR CODE THEO TỪNG LOẠI
+    // XỬ LÝ QR CODE
     let qrUrl = "";
     const bankInfo = BANK_CONFIG[bankSelected];
     document.getElementById("bankNameDisplay").innerText = bankInfo.name;
     document.getElementById("transferContent").innerText = orderId;
 
     if (bankSelected === "MOMO") {
-        // Nếu chọn Momo -> Dùng ảnh tĩnh
         qrUrl = bankInfo.staticImage;
-        // Có thể thêm ghi chú cho Momo
         document.getElementById("transferContent").innerText = orderId + " (Ghi lời nhắn)";
     } else {
-        // Nếu chọn Ngân hàng -> Dùng VietQR tạo ảnh động
-        // Cú pháp: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-compact.png?amount=<TIỀN>&addInfo=<NỘI_DUNG>
         qrUrl = `https://img.vietqr.io/image/${bankInfo.bin}-${bankInfo.acc}-compact.png?amount=${totalPrice}&addInfo=${orderId}`;
     }
 
-    // Gán ảnh vào Modal
     document.getElementById("qrImage").src = qrUrl;
 
-    // Chuẩn bị dữ liệu gửi Backend
     const passengersList = [];
     for(let i=0; i<flight.passengers; i++){
         passengersList.push({ name: `${name} ${i==0?'':'(Kèm)'}`, age: Number(age) });
@@ -262,17 +274,39 @@ document.addEventListener("DOMContentLoaded", function(){
 
             if(res.status === 201 || data.success) {
                 paymentModal.hide();
-                alert("Thanh toán thành công! Vé đã được gửi tới email.");
-                localStorage.removeItem("selectedFlight");
-                window.location.href = "mytickets.html";
+
+                // THÔNG BÁO THÀNH CÔNG ĐẸP
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thanh toán thành công!',
+                    html: 'Vé điện tử đã được xuất.<br>Cảm ơn bạn đã chọn SkyBook!',
+                    confirmButtonText: 'Xem vé của tôi ngay',
+                    confirmButtonColor: '#28a745',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        localStorage.removeItem("selectedFlight");
+                        window.location.href = "mytickets.html";
+                    }
+                });
             } else {
-                alert(data.message || "Lỗi đặt vé!");
+                // THÔNG BÁO LỖI ĐẸP
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Có lỗi xảy ra!',
+                    text: data.message || "Không thể xác nhận thanh toán."
+                });
                 btn.disabled = false;
                 btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Tôi đã chuyển khoản';
             }
         } catch (err) {
             console.error(err);
-            alert("Lỗi kết nối Server!");
+            // THÔNG BÁO LỖI SERVER ĐẸP
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi kết nối',
+                text: 'Không thể kết nối đến Server!'
+            });
             btn.disabled = false;
             btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Tôi đã chuyển khoản';
         }

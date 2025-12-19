@@ -1,24 +1,31 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   /* =====================================================
-     1. CÁC HÀM DÙNG CHUNG (HELPER) & NAVBAR
+     1. ƯU TIÊN SỐ 1: VẼ NAVBAR (MENU) TRƯỚC
+     (Để dù code dưới có lỗi thì menu vẫn hiện)
   ===================================================== */
   
-  // Hàm lấy user đang đăng nhập
+  // Hàm lấy user an toàn
   function getLoggedUser() {
-    return JSON.parse(localStorage.getItem("loggedInUser") || "null");
+    try {
+        return JSON.parse(localStorage.getItem("loggedInUser") || "null");
+    } catch (e) {
+        return null;
+    }
   }
 
-  // Hàm render Navbar
   const navRight = document.getElementById("navRightArea");
   if (navRight) {
     const user = getLoggedUser();
+    
     if (!user) {
+      // CHƯA ĐĂNG NHẬP
       navRight.innerHTML = `
         <li class="nav-item"><a class="nav-link" href="login.html">Đăng nhập</a></li>
         <li class="nav-item"><a class="nav-link" href="register.html">Đăng ký</a></li>
       `;
     } else {
+      // ĐÃ ĐĂNG NHẬP
       navRight.innerHTML = `
         <li class="nav-item d-flex align-items-center me-3 text-white">
           Xin chào, <strong class="ms-2">${user.name}</strong>
@@ -30,16 +37,76 @@ document.addEventListener("DOMContentLoaded", function () {
           <button id="logoutBtn" class="btn btn-outline-light ms-2">Đăng xuất</button>
         </li>
       `;
+      
+      // Sự kiện Đăng xuất
       document.getElementById("logoutBtn").addEventListener("click", () => {
-        localStorage.removeItem("loggedInUser");
-        localStorage.removeItem("token");
-        window.location.href = "index.html";
+        // Kiểm tra xem có thư viện Swal không
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Đăng xuất?',
+                text: "Bạn có chắc muốn thoát tài khoản?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) doLogout();
+            });
+        } else {
+            // Fallback nếu lỗi thư viện
+            if(confirm("Bạn muốn đăng xuất?")) doLogout();
+        }
       });
     }
   }
 
+  function doLogout() {
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
+  }
+
+
   /* =====================================================
-     2. AUTOCOMPLETE (GỢI Ý SÂN BAY)
+     2. CẤU HÌNH THÔNG BÁO (SWEETALERT)
+     (Để trong try-catch để an toàn)
+  ===================================================== */
+  let Toast = null;
+  try {
+      if (typeof Swal !== 'undefined') {
+        Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+        // Gán vào window để các file khác dùng ké
+        window.Toast = Toast;
+      }
+  } catch (e) {
+      console.warn("Chưa nhúng thư viện SweetAlert2, sẽ dùng alert thường.");
+  }
+
+  // Hàm hiển thị thông báo an toàn (Dùng cho bên dưới)
+  function showNotify(type, message) {
+      if (Toast) {
+          Toast.fire({ icon: type, title: message });
+      } else {
+          // Nếu không có Toast thì dùng alert thường
+          if(type === 'error') alert(message);
+          console.log(type.toUpperCase() + ": " + message);
+      }
+  }
+
+
+  /* =====================================================
+     3. AUTOCOMPLETE (GỢI Ý SÂN BAY)
   ===================================================== */
   const airports = [
     { code: "HAN", name: "Sân bay Nội Bài", city: "Hà Nội" },
@@ -105,18 +172,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Kích hoạt autocomplete
   setupAutocomplete("from", "suggestions-from");
   setupAutocomplete("to", "suggestions-to");
 
 
   /* =====================================================
-     3. XỬ LÝ FORM TÌM KIẾM (INDEX.HTML)
+     4. XỬ LÝ FORM TÌM KIẾM
   ===================================================== */
   const searchForm = document.getElementById("searchForm");
   const departInput = document.getElementById("depart");
 
-  // Chặn ngày quá khứ
   if(departInput) {
     const today = new Date().toISOString().split("T")[0];
     departInput.setAttribute("min", today);
@@ -125,12 +190,23 @@ document.addEventListener("DOMContentLoaded", function () {
   if (searchForm) {
     searchForm.addEventListener("submit", function (e) {
       e.preventDefault();
-
-      // Kiểm tra đăng nhập
       const token = localStorage.getItem("token");
+      
       if (!token) {
-        alert("Bạn cần đăng nhập để tìm kiếm chuyến bay!");
-        window.location.href = "login.html";
+        // Dùng Swal đẹp nếu có
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Yêu cầu đăng nhập',
+                text: 'Bạn cần đăng nhập để tìm kiếm chuyến bay!',
+                confirmButtonText: 'Đăng nhập ngay'
+            }).then((result) => {
+                if(result.isConfirmed) window.location.href = "login.html";
+            });
+        } else {
+            alert("Bạn cần đăng nhập!");
+            window.location.href = "login.html";
+        }
         return;
       }
 
@@ -146,14 +222,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   /* =====================================================
-     4. TÍNH NĂNG BÌNH LUẬN (REVIEWS)
+     5. TÍNH NĂNG BÌNH LUẬN (REVIEWS)
   ===================================================== */
   const reviewListEl = document.getElementById("reviewList");
   const reviewFormContainer = document.getElementById("reviewFormContainer");
   const loginWarning = document.getElementById("loginWarning");
   const reviewForm = document.getElementById("reviewForm");
   
-  // A. Logic Ẩn/Hiện Form Review
   const currentUser = getLoggedUser();
   const token = localStorage.getItem("token");
 
@@ -165,7 +240,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (loginWarning) loginWarning.style.display = "block";
   }
 
-  // B. Hàm vẽ sao
   function renderStars(rating) {
     let stars = "";
     for (let i = 0; i < 5; i++) {
@@ -175,7 +249,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return stars;
   }
 
-  // C. Hàm Load Reviews từ API
   async function loadReviews() {
     if (!reviewListEl) return;
     try {
@@ -190,8 +263,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         data.data.forEach(r => {
-          // Logic hiển thị nút Xóa
           let deleteBtn = '';
+          // Kiểm tra quyền xóa
           if (currentUser && r.user && (currentUser._id === r.user._id || currentUser.id === r.user._id)) {
              deleteBtn = `
                 <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 m-2" 
@@ -229,14 +302,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Load lần đầu
   loadReviews();
 
-  // D. Gửi Review Mới
   if (reviewForm) {
     reviewForm.addEventListener("submit", async function(e) {
-      e.preventDefault(); // <--- QUAN TRỌNG: Chặn load lại trang
-      
+      e.preventDefault(); 
       const rating = document.getElementById("ratingInput").value;
       const comment = document.getElementById("commentInput").value;
 
@@ -249,18 +319,17 @@ document.addEventListener("DOMContentLoaded", function () {
           },
           body: JSON.stringify({ rating, comment })
         });
-
         const data = await res.json();
         
         if (data.success) {
-          alert("Cảm ơn bạn đã đánh giá!");
+          showNotify('success', 'Cảm ơn bạn đã đánh giá!');
           reviewForm.reset();
           loadReviews(); 
         } else {
-          alert(data.message || "Lỗi khi gửi đánh giá");
+          showNotify('error', data.message || "Lỗi khi gửi đánh giá");
         }
       } catch (err) {
-        alert("Lỗi kết nối Server");
+        showNotify('error', "Lỗi kết nối Server");
       }
     });
   }
@@ -268,10 +337,24 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* =====================================================
-   5. HÀM XÓA REVIEW (Phải để ngoài DOMContentLoaded)
+   6. HÀM XÓA REVIEW (Toàn cục)
 ===================================================== */
 window.deleteReview = async function(reviewId) {
-  if(!confirm("Bạn có chắc chắn muốn xóa đánh giá này không?")) return;
+  // Check nếu có Swal thì dùng, ko thì dùng confirm thường
+  if (typeof Swal !== 'undefined') {
+      const result = await Swal.fire({
+          title: 'Xóa bình luận?',
+          text: "Bạn không thể hoàn tác!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          confirmButtonText: 'Xóa ngay',
+          cancelButtonText: 'Hủy'
+      });
+      if (!result.isConfirmed) return;
+  } else {
+      if(!confirm("Bạn chắc chắn muốn xóa?")) return;
+  }
 
   const token = localStorage.getItem("token");
   try {
@@ -282,9 +365,19 @@ window.deleteReview = async function(reviewId) {
       const data = await res.json();
       
       if(res.status === 200) {
-          alert("Đã xóa thành công!");
-          // Reload lại trang để cập nhật danh sách (hoặc gọi hàm loadReviews nếu export nó ra)
-          window.location.reload(); 
+          if (typeof Swal !== 'undefined') {
+             Swal.fire({
+                 icon: 'success',
+                 title: 'Đã xóa!',
+                 toast: true,
+                 position: 'top-end',
+                 showConfirmButton: false,
+                 timer: 2000
+             });
+          } else {
+             alert("Đã xóa thành công!");
+          }
+          setTimeout(() => window.location.reload(), 1000);
       } else {
           alert(data.message || "Không thể xóa!");
       }

@@ -42,10 +42,22 @@ document.getElementById("registerForm").addEventListener("submit", async functio
       localStorage.setItem("token", data.token);
       localStorage.setItem("loggedInUser", JSON.stringify(data.data));
       
-      alert("Đăng ký thành công!");
-      window.location.href = "index.html";
+      Swal.fire({
+        icon: 'success',
+        title: 'Đăng ký thành công!',
+        text: 'Chào mừng đến với SkyBook',
+        timer: 2000,
+        showConfirmButton: false,
+        timerProgressBar: true
+      }).then(() => {
+        window.location.href = "index.html";
+      });
     } else {
-      alert(data.message || "Đăng ký thất bại");
+      Swal.fire({
+        icon: 'error',
+        title: 'Đăng ký thất bại',
+        text: data.message || 'Vui lòng thử lại.'
+      });
     }
   } catch (err) {
     console.error(err);
@@ -53,5 +65,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
   }
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="assets/js/app.js"></script>
 </body>
 </html>

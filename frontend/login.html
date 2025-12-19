@@ -19,6 +19,8 @@
   <p>Chưa có tài khoản? <a href="register.html">Đăng ký</a></p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="assets/js/app.js"></script>
 <script>
 document.getElementById("loginForm").addEventListener("submit", async function(e){
   e.preventDefault();
@@ -39,10 +41,22 @@ document.getElementById("loginForm").addEventListener("submit", async function(e
       localStorage.setItem("token", data.token);
       localStorage.setItem("loggedInUser", JSON.stringify(data.data)); // data.data chứa info user
 
-      alert("Đăng nhập thành công!");
-      window.location.href = "index.html";
+      Swal.fire({
+        icon: 'success',
+        title: 'Đăng nhập thành công!',
+        text: 'Chào mừng bạn quay trở lại.',
+        timer: 2000,
+        showConfirmButton: false,
+        timerProgressBar: true
+      }).then(() => {
+        window.location.href = "index.html";
+      });
     } else {
-      alert(data.message || "Sai thông tin đăng nhập!");
+      Swal.fire({
+        icon: 'error',
+        title: 'Đăng nhập thất bại',
+        text: data.message || 'Email hoặc mật khẩu không đúng!'
+      });
     }
   } catch (err) {
     console.error(err);
