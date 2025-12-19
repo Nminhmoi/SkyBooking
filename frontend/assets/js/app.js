@@ -1,14 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  /* ========== 1. NAVBAR (DÙNG CHUNG) ========== */
-  const navRight = document.getElementById("navRightArea");
-
+  /* =====================================================
+     1. CÁC HÀM DÙNG CHUNG (HELPER) & NAVBAR
+  ===================================================== */
+  
+  // Hàm lấy user đang đăng nhập
   function getLoggedUser() {
     return JSON.parse(localStorage.getItem("loggedInUser") || "null");
   }
 
-  function renderNavbar() {
-    if (!navRight) return;
+  // Hàm render Navbar
+  const navRight = document.getElementById("navRightArea");
+  if (navRight) {
     const user = getLoggedUser();
     if (!user) {
       navRight.innerHTML = `
@@ -27,60 +30,17 @@ document.addEventListener("DOMContentLoaded", function () {
           <button id="logoutBtn" class="btn btn-outline-light ms-2">Đăng xuất</button>
         </li>
       `;
-      document.getElementById("logoutBtn").onclick = () => {
+      document.getElementById("logoutBtn").addEventListener("click", () => {
         localStorage.removeItem("loggedInUser");
         localStorage.removeItem("token");
         window.location.href = "index.html";
-      };
+      });
     }
   }
-  renderNavbar();
 
-  /* ========== 2. XỬ LÝ FORM TÌM KIẾM (INDEX.HTML) ========== */
-  const searchForm = document.getElementById("searchForm");
-  const departInput = document.getElementById("depart");
-
-  if (searchForm) {
-    
-    // --- A. CHẶN CHỌN NGÀY QUÁ KHỨ ---
-    const today = new Date().toISOString().split("T")[0]; // Lấy ngày hiện tại YYYY-MM-DD
-    if(departInput) {
-        departInput.setAttribute("min", today); // Set thuộc tính min
-    }
-
-    // --- B. XỬ LÝ SỰ KIỆN TÌM KIẾM ---
-    searchForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      // --- C. KIỂM TRA ĐĂNG NHẬP ---
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Bạn cần đăng nhập để tìm kiếm chuyến bay!");
-        window.location.href = "login.html";
-        return; // Dừng lại, không cho đi tiếp
-      }
-
-      const from = document.getElementById("from").value.trim();
-      const to = document.getElementById("to").value.trim();
-      const depart = departInput.value;
-      const passengers = document.getElementById("passengers").value || 1;
-
-      // Tạo URL query string
-      const query = new URLSearchParams({
-        from,
-        to,
-        depart,
-        passengers
-      }).toString();
-
-      // Chuyển sang trang kết quả
-      window.location.href = "search.html?" + query;
-    });
-  }
-
-  /* ========== 3. AUTOCOMPLETE (GỢI Ý SÂN BAY) ========== */
-  
-  // Dữ liệu sân bay phổ biến tại Việt Nam
+  /* =====================================================
+     2. AUTOCOMPLETE (GỢI Ý SÂN BAY)
+  ===================================================== */
   const airports = [
     { code: "HAN", name: "Sân bay Nội Bài", city: "Hà Nội" },
     { code: "SGN", name: "Sân bay Tân Sơn Nhất", city: "TP HCM" },
@@ -90,28 +50,23 @@ document.addEventListener("DOMContentLoaded", function () {
     { code: "HPH", name: "Sân bay Cát Bi", city: "Hải Phòng" },
     { code: "VCA", name: "Sân bay Cần Thơ", city: "Cần Thơ" },
     { code: "DLI", name: "Sân bay Liên Khương", city: "Đà Lạt" },
-    { code: "HUI", name: "Sân bay Phú Bài", city: "Huế" },
-    { code: "UIH", name: "Sân bay Phù Cát", city: "Quy Nhơn" }
+    { code: "HUI", name: "Sân bay Phú Bài", city: "Huế" }
   ];
 
-  // Hàm setup gợi ý cho 1 ô input
   function setupAutocomplete(inputId, listId) {
     const input = document.getElementById(inputId);
     const list = document.getElementById(listId);
-
     if (!input || !list) return;
 
-    // Khi gõ phím
     input.addEventListener("input", function() {
       const value = this.value.toLowerCase().trim();
-      list.innerHTML = ""; // Xóa gợi ý cũ
-
+      list.innerHTML = ""; 
+      
       if (!value) {
         list.classList.remove("show");
         return;
       }
 
-      // Lọc sân bay theo tên hoặc mã hoặc thành phố
       const filtered = airports.filter(a => 
         a.name.toLowerCase().includes(value) || 
         a.city.toLowerCase().includes(value) ||
@@ -123,11 +78,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // Vẽ danh sách ra HTML
       filtered.forEach(item => {
         const li = document.createElement("li");
         li.className = "suggestion-item";
-        // Icon máy bay + Tên + Thành phố + Mã sân bay
         li.innerHTML = `
           <i class="bi bi-airplane suggestion-icon"></i>
           <div class="suggestion-info">
@@ -136,20 +89,15 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
           <span class="suggestion-code">${item.code}</span>
         `;
-
-        // Khi click vào 1 dòng gợi ý
         li.addEventListener("click", function() {
-          input.value = item.city; // Điền tên thành phố vào ô input
-          list.classList.remove("show"); // Ẩn danh sách
+          input.value = item.city;
+          list.classList.remove("show");
         });
-
         list.appendChild(li);
       });
-
       list.classList.add("show");
     });
 
-    // Ẩn danh sách khi click ra ngoài
     document.addEventListener("click", function(e) {
       if (!input.contains(e.target) && !list.contains(e.target)) {
         list.classList.remove("show");
@@ -157,34 +105,67 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Kích hoạt cho cả 2 ô
+  // Kích hoạt autocomplete
   setupAutocomplete("from", "suggestions-from");
   setupAutocomplete("to", "suggestions-to");
 
-  /* ========== KẾT THÚC AUTOCOMPLETE ========== */
 
-  /* ========== 4. XỬ LÝ BÌNH LUẬN (REVIEWS) ========== */
+  /* =====================================================
+     3. XỬ LÝ FORM TÌM KIẾM (INDEX.HTML)
+  ===================================================== */
+  const searchForm = document.getElementById("searchForm");
+  const departInput = document.getElementById("depart");
+
+  // Chặn ngày quá khứ
+  if(departInput) {
+    const today = new Date().toISOString().split("T")[0];
+    departInput.setAttribute("min", today);
+  }
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Kiểm tra đăng nhập
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Bạn cần đăng nhập để tìm kiếm chuyến bay!");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const from = document.getElementById("from").value.trim();
+      const to = document.getElementById("to").value.trim();
+      const depart = departInput.value;
+      const passengers = document.getElementById("passengers").value || 1;
+
+      const query = new URLSearchParams({ from, to, depart, passengers }).toString();
+      window.location.href = "search.html?" + query;
+    });
+  }
+
+
+  /* =====================================================
+     4. TÍNH NĂNG BÌNH LUẬN (REVIEWS)
+  ===================================================== */
   const reviewListEl = document.getElementById("reviewList");
   const reviewFormContainer = document.getElementById("reviewFormContainer");
-  const loginWarning = document.getElementById("loginWarning"); // Lấy thẻ thông báo
+  const loginWarning = document.getElementById("loginWarning");
   const reviewForm = document.getElementById("reviewForm");
   
-  // --- LOGIC ẨN/HIỆN FORM ---
-  const user = getLoggedUser();
+  // A. Logic Ẩn/Hiện Form Review
+  const currentUser = getLoggedUser();
   const token = localStorage.getItem("token");
 
-  if (user && token) {
-    // Nếu đã đăng nhập
-    if (reviewFormContainer) reviewFormContainer.style.display = "block"; // Hiện form
-    if (loginWarning) loginWarning.style.display = "none"; // Ẩn thông báo "Vui lòng đăng nhập"
+  if (currentUser && token) {
+    if (reviewFormContainer) reviewFormContainer.style.display = "block"; 
+    if (loginWarning) loginWarning.style.display = "none";
   } else {
-    // Nếu chưa đăng nhập
-    if (reviewFormContainer) reviewFormContainer.style.display = "none"; // Ẩn form
-    if (loginWarning) loginWarning.style.display = "block"; // Hiện thông báo
+    if (reviewFormContainer) reviewFormContainer.style.display = "none";
+    if (loginWarning) loginWarning.style.display = "block";
   }
-  // --------------------------
 
-  // 2. Hàm render sao (1 -> ★, 5 -> ★★★★★)
+  // B. Hàm vẽ sao
   function renderStars(rating) {
     let stars = "";
     for (let i = 0; i < 5; i++) {
@@ -194,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return stars;
   }
 
-  // 3. Load danh sách bình luận từ API
+  // C. Hàm Load Reviews từ API
   async function loadReviews() {
     if (!reviewListEl) return;
     try {
@@ -209,10 +190,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         data.data.forEach(r => {
+          // Logic hiển thị nút Xóa
+          let deleteBtn = '';
+          if (currentUser && r.user && (currentUser._id === r.user._id || currentUser.id === r.user._id)) {
+             deleteBtn = `
+                <button class="btn btn-sm btn-outline-danger border-0 position-absolute top-0 end-0 m-2" 
+                        onclick="deleteReview('${r._id}')" title="Xóa bình luận">
+                    <i class="bi bi-trash"></i>
+                </button>
+             `;
+          }
+
           const div = document.createElement("div");
-          div.className = "col-md-4";
+          div.className = "col-md-4 position-relative"; 
           div.innerHTML = `
             <div class="card h-100 border-0 shadow-sm">
+              ${deleteBtn}
               <div class="card-body p-4">
                 <div class="mb-2">${renderStars(r.rating)}</div>
                 <p class="card-text text-secondary">"${r.comment}"</p>
@@ -232,17 +225,17 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
     } catch (err) {
-      console.error(err);
+      console.error("Lỗi load review:", err);
     }
   }
 
-  // Gọi hàm load khi trang tải xong
+  // Load lần đầu
   loadReviews();
 
-  // 4. Xử lý Gửi bình luận
+  // D. Gửi Review Mới
   if (reviewForm) {
     reviewForm.addEventListener("submit", async function(e) {
-      e.preventDefault();
+      e.preventDefault(); // <--- QUAN TRỌNG: Chặn load lại trang
       
       const rating = document.getElementById("ratingInput").value;
       const comment = document.getElementById("commentInput").value;
@@ -262,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.success) {
           alert("Cảm ơn bạn đã đánh giá!");
           reviewForm.reset();
-          loadReviews(); // Tải lại danh sách để hiện bình luận mới
+          loadReviews(); 
         } else {
           alert(data.message || "Lỗi khi gửi đánh giá");
         }
@@ -271,5 +264,31 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
-  /* ========== KẾT THÚC REVIEWS ========== */
+
 });
+
+/* =====================================================
+   5. HÀM XÓA REVIEW (Phải để ngoài DOMContentLoaded)
+===================================================== */
+window.deleteReview = async function(reviewId) {
+  if(!confirm("Bạn có chắc chắn muốn xóa đánh giá này không?")) return;
+
+  const token = localStorage.getItem("token");
+  try {
+      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+          method: 'DELETE',
+          headers: { 'x-auth-token': token }
+      });
+      const data = await res.json();
+      
+      if(res.status === 200) {
+          alert("Đã xóa thành công!");
+          // Reload lại trang để cập nhật danh sách (hoặc gọi hàm loadReviews nếu export nó ra)
+          window.location.reload(); 
+      } else {
+          alert(data.message || "Không thể xóa!");
+      }
+  } catch (err) {
+      alert("Lỗi kết nối server!");
+  }
+};

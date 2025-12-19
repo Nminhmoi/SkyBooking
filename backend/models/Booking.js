@@ -2,30 +2,32 @@ const mongoose = require('mongoose');
 
 const BookingSchema = new mongoose.Schema({
   user: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User', // Liên kết tới bảng User
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   flight: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Flight', // Liên kết tới bảng Flight
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Flight',
     required: true
   },
   passengers: [
     {
       name: { type: String, required: true },
-      age: { type: Number }
+      age: { type: Number, required: true }
     }
   ],
-  totalPrice: {
-    type: Number,
-    required: true
+  // --- THÊM 2 DÒNG NÀY ---
+  bookingCode: { 
+    type: String, 
+    default: '' // Lưu mã SKY... ví dụ: SKY8839
   },
   status: {
     type: String,
-    enum: ['booked', 'cancelled'],
-    default: 'booked'
+    enum: ['pending', 'paid', 'cancelled'],
+    default: 'paid' // Mặc định là 'paid' vì khách bấm xác nhận rồi mới lưu
   },
+  // -----------------------
   bookingDate: {
     type: Date,
     default: Date.now

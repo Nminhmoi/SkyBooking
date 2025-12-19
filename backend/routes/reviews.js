@@ -5,5 +5,6 @@ const auth = require('../middleware/auth');
 
 router.get('/', reviewController.getReviews);
 router.post('/', auth, reviewController.createReview); // Cần đăng nhập mới được comment
+router.delete('/:id', auth, reviewController.deleteReview);
 
 module.exports = router;

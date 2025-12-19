@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Đặt vé - SkyBook</title>
+<title>Đặt vé & Thanh toán - SkyBook</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -23,32 +23,101 @@
 </nav>
 
 <div class="container py-5">
-  <h3 class="mb-4">Xác nhận đặt vé</h3>
+  <h3 class="mb-4">Xác nhận & Thanh toán</h3>
 
-  <div class="card p-4 mb-4 shadow-sm">
-    <p><strong>Chuyến bay:</strong> <span id="flightInfo" class="text-primary fw-bold"></span></p>
-    <p>Thời gian: <span id="flightTime"></span></p>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card p-4 mb-4 shadow-sm">
+        <h5 class="mb-3">Thông tin liên hệ</h5>
+        <div class="mb-3">
+          <input type="text" id="name" class="form-control mb-2" placeholder="Họ tên hành khách đại diện" required>
+          <input type="number" id="age" class="form-control mb-2" placeholder="Tuổi" required value="20">
+          <input type="email" id="email" class="form-control mb-2" placeholder="Email nhận vé" required>
+          <input type="text" id="phone" class="form-control" placeholder="Số điện thoại" required>
+        </div>
+        
+        <hr>
+        <h5 class="mb-3">Phương thức thanh toán</h5>
+        
+        <div class="mb-3">
+            <label class="form-label fw-bold">Chọn cổng thanh toán:</label>
+            <select id="bankSelect" class="form-select border-primary">
+                <option value="MB">🏦 Ngân hàng MB Bank (Tự động)</option>
+                <option value="BIDV">🏦 Ngân hàng BIDV (Tự động)</option>
+                <option value="MOMO">👛 Ví điện tử Momo (Quét mã)</option>
+            </select>
+        </div>
 
-    <div class="mb-3">
-      <label class="form-label">Số lượng hành khách</label>
-      <input type="number" id="ticketCount" class="form-control" readonly>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="paymentMethod" id="payQR" checked>
+            <label class="form-check-label" for="payQR">
+                Chuyển khoản / Quét mã
+            </label>
+            <div class="small text-muted ms-4">Nội dung chuyển khoản tự động, xác nhận tức thì.</div>
+        </div>
+      </div>
     </div>
 
-    <p class="fs-5"><strong>Tổng tiền tạm tính:</strong> <span id="totalPrice" class="text-danger fw-bold"></span></p>
-    
-    <hr>
-    <h5>Thông tin hành khách đại diện</h5>
-    <div class="mb-3">
-      <input type="text" id="name" class="form-control mb-2" placeholder="Họ tên hành khách" required>
-      <input type="number" id="age" class="form-control mb-2" placeholder="Tuổi" required value="20">
-    </div>
+    <div class="col-md-4">
+      <div class="card p-4 shadow-sm bg-light">
+        <h5 class="mb-3">Chi tiết chuyến bay</h5>
+        <p class="mb-1 text-primary fw-bold" id="airlineInfo"></p>
+        <p class="mb-1"><strong id="routeInfo"></strong></p>
+        <p class="small text-muted mb-3" id="timeInfo"></p>
+        
+        <hr>
+        <div class="d-flex justify-content-between mb-2">
+            <span>Số khách:</span>
+            <strong id="passengerCountDisplay">1</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+            <span>Đơn giá:</span>
+            <span id="priceDisplay">0đ</span>
+        </div>
+        <hr>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fs-5 fw-bold">Tổng cộng:</span>
+            <span class="fs-4 fw-bold text-danger" id="totalPrice">0đ</span>
+        </div>
 
-    <button id="payBtn" class="btn btn-success w-100 py-2">Xác nhận đặt vé</button>
+        <button id="btnOpenPayment" class="btn btn-success w-100 py-3 mt-4 fw-bold shadow">
+            THANH TOÁN NGAY
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="paymentModal" data-bs-backdrop="static" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Quét mã để thanh toán</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2">Vui lòng mở App <strong id="bankNameDisplay"></strong> và quét mã:</p>
+        
+        <div class="my-3 border p-2 d-inline-block rounded bg-white shadow-sm position-relative">
+            <img id="qrImage" src="" alt="QR Code" class="img-fluid" style="max-height: 300px;">
+        </div>
+
+        <div class="alert alert-warning small py-2">
+            <i class="bi bi-info-circle"></i> Nội dung chuyển khoản:<br>
+            <strong id="transferContent" class="fs-5 text-danger">...</strong>
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button id="btnConfirmPaid" class="btn btn-success px-4">
+            <i class="bi bi-check-circle-fill"></i> Tôi đã chuyển khoản
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
 
-<footer class="bg-dark text-white pt-5">
+<footer class="bg-dark text-white pt-5 mt-5">
   <div class="container">
       <div class="text-center mt-3 border-top pt-3">
       <small>© 2025 SkyBook. All rights reserved.</small>
@@ -56,10 +125,11 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
 
-  // --- 1. Navbar & Auth Check ---
+  // --- 1. KHỞI TẠO & CHECK LOGIN ---
   const navRight = document.getElementById("navRightArea");
   const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
   const token = localStorage.getItem("token");
@@ -70,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function(){
     return;
   }
 
+  // Render Navbar
   navRight.innerHTML = `
     <li class="nav-item d-flex align-items-center me-3 text-white">Xin chào, <strong class="ms-2">${user.name}</strong></li>
     <li class="nav-item"><a class="nav-link text-warning fw-bold" href="mytickets.html">Vé đã đặt</a></li>
@@ -81,71 +152,134 @@ document.addEventListener("DOMContentLoaded", function(){
     window.location.href="index.html";
   });
 
-  // --- 2. Load thông tin chuyến bay từ LocalStorage (được lưu ở trang search) ---
+  // --- 2. LOAD THÔNG TIN VÉ ---
   const flight = JSON.parse(localStorage.getItem("selectedFlight") || "null");
-  
   if(!flight) {
       alert("Chưa chọn chuyến bay!");
       window.location.href = "index.html";
       return;
   }
 
-  const date = new Date(flight.startTime);
-  document.getElementById("flightInfo").innerText = `${flight.airline}: ${flight.from} ➝ ${flight.to}`;
-  document.getElementById("flightTime").innerText = date.toLocaleString('vi-VN');
+  // Điền dữ liệu vào giao diện
+  document.getElementById("airlineInfo").innerText = flight.airline;
+  document.getElementById("routeInfo").innerText = `${flight.from} ➝ ${flight.to}`;
+  document.getElementById("timeInfo").innerText = new Date(flight.startTime).toLocaleString('vi-VN');
   
-  const ticketCountInput = document.getElementById("ticketCount");
-  ticketCountInput.value = flight.passengers;
+  document.getElementById("passengerCountDisplay").innerText = flight.passengers;
+  document.getElementById("priceDisplay").innerText = flight.price.toLocaleString('vi-VN') + 'đ';
   
-  // Tính tiền
   const totalPrice = flight.price * flight.passengers;
   document.getElementById("totalPrice").innerText = totalPrice.toLocaleString('vi-VN') + 'đ';
 
-  // --- 3. Xử lý Đặt vé (GỌI API) ---
-  document.getElementById("payBtn").addEventListener("click", async function(){
+
+  // --- 3. XỬ LÝ THANH TOÁN ---
+  const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+  let bookingData = {}; 
+
+  // --- CẤU HÌNH TÀI KHOẢN --
+  const BANK_CONFIG = {
+    "MB": {
+        bin: "MB",           
+        acc: "0857293888",   
+        name: "MB Bank"
+    },
+    "BIDV": {
+        bin: "BIDV",         
+        acc: "8813788174",   
+        name: "BIDV"
+    },
+    "MOMO": {
+        staticImage: "assets/img/momo-qr.jpg", 
+        name: "Ví Momo"
+    }
+  };
+
+  document.getElementById("btnOpenPayment").addEventListener("click", function(){
     const name = document.getElementById("name").value.trim();
     const age = document.getElementById("age").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const bankSelected = document.getElementById("bankSelect").value; // Lấy ngân hàng user chọn
 
-    if(!name){ alert("Vui lòng điền tên hành khách."); return; }
+    if(!name || !email || !phone){ alert("Vui lòng điền đầy đủ thông tin liên hệ."); return; }
 
-    // Tạo danh sách hành khách (Logic đơn giản: Nhân bản người đặt cho đủ số lượng)
-    // Thực tế nên có form nhập từng người. Ở đây làm nhanh.
+    const orderId = "SKY" + Math.floor(Math.random() * 10000);
+
+    // XỬ LÝ QR CODE THEO TỪNG LOẠI
+    let qrUrl = "";
+    const bankInfo = BANK_CONFIG[bankSelected];
+    document.getElementById("bankNameDisplay").innerText = bankInfo.name;
+    document.getElementById("transferContent").innerText = orderId;
+
+    if (bankSelected === "MOMO") {
+        // Nếu chọn Momo -> Dùng ảnh tĩnh
+        qrUrl = bankInfo.staticImage;
+        // Có thể thêm ghi chú cho Momo
+        document.getElementById("transferContent").innerText = orderId + " (Ghi lời nhắn)";
+    } else {
+        // Nếu chọn Ngân hàng -> Dùng VietQR tạo ảnh động
+        // Cú pháp: https://img.vietqr.io/image/<BANK_ID>-<ACCOUNT_NO>-compact.png?amount=<TIỀN>&addInfo=<NỘI_DUNG>
+        qrUrl = `https://img.vietqr.io/image/${bankInfo.bin}-${bankInfo.acc}-compact.png?amount=${totalPrice}&addInfo=${orderId}`;
+    }
+
+    // Gán ảnh vào Modal
+    document.getElementById("qrImage").src = qrUrl;
+
+    // Chuẩn bị dữ liệu gửi Backend
     const passengersList = [];
     for(let i=0; i<flight.passengers; i++){
         passengersList.push({ name: `${name} ${i==0?'':'(Kèm)'}`, age: Number(age) });
     }
 
-    try {
-        const res = await fetch('http://localhost:5000/api/bookings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-auth-token': token // Gửi token lên để xác thực
-            },
-            body: JSON.stringify({
-                flightId: flight.flightId,
-                passengers: passengersList
-            })
-        });
+    bookingData = {
+        flightId: flight.flightId,
+        passengers: passengersList,
+        bookingCode: orderId 
+    };
 
-        const data = await res.json();
+    paymentModal.show();
+  });
 
-        if(res.status === 201 || data.success) {
-            alert("Đặt vé thành công!");
-            localStorage.removeItem("selectedFlight");
-            window.location.href = "mytickets.html";
-        } else {
-            alert(data.message || "Đặt vé thất bại!");
+
+  // --- 4. BẤM "TÔI ĐÃ CHUYỂN KHOẢN" ---
+  document.getElementById("btnConfirmPaid").addEventListener("click", async function(){
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+
+    setTimeout(async () => {
+        try {
+            const res = await fetch('http://localhost:5000/api/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
+                body: JSON.stringify(bookingData)
+            });
+
+            const data = await res.json();
+
+            if(res.status === 201 || data.success) {
+                paymentModal.hide();
+                alert("Thanh toán thành công! Vé đã được gửi tới email.");
+                localStorage.removeItem("selectedFlight");
+                window.location.href = "mytickets.html";
+            } else {
+                alert(data.message || "Lỗi đặt vé!");
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Tôi đã chuyển khoản';
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Lỗi kết nối Server!");
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Tôi đã chuyển khoản';
         }
-
-    } catch (err) {
-        console.error(err);
-        alert("Lỗi kết nối Server!");
-    }
+    }, 1500); 
   });
 
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
