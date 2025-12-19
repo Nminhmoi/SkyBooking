@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Dashboard - Quản lý chuyến bay</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-uppercase" href="admin.html">
+        <i class="bi bi-speedometer2"></i> SkyBook Admin
+    </a>
+    <div class="d-flex">
+        <a href="index.html" class="btn btn-outline-light btn-sm me-2">Về Trang chủ</a>
+        <button id="logoutBtn" class="btn btn-danger btn-sm">Đăng xuất</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Thêm chuyến bay mới</h5>
+                </div>
+                <div class="card-body">
+                    <form id="addFlightForm">
+                        <div class="mb-3">
+                            <label class="form-label">Hãng hàng không</label>
+                            <select id="airline" class="form-select" required>
+                                <option value="Vietnam Airlines">Vietnam Airlines</option>
+                                <option value="VietJet Air">VietJet Air</option>
+                                <option value="Bamboo Airways">Bamboo Airways</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Điểm đi</label>
+                                <input type="text" id="from" class="form-control" placeholder="VD: Hà Nội" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Điểm đến</label>
+                                <input type="text" id="to" class="form-control" placeholder="VD: TP HCM" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Thời gian khởi hành</label>
+                            <input type="datetime-local" id="startTime" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giá vé (VND)</label>
+                            <input type="number" id="price" class="form-control" placeholder="VD: 1500000" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-save"></i> Lưu chuyến bay
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-primary fw-bold">Danh sách chuyến bay hiện có</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="loadFlights()">
+                        <i class="bi bi-arrow-clockwise"></i> Làm mới
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hãng</th>
+                                    <th>Hành trình</th>
+                                    <th>Giờ bay</th>
+                                    <th>Giá vé</th>
+                                    <th class="text-end">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="flightTableBody">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    
+    // 1. Lấy thông tin User
+    const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+    const token = localStorage.getItem("token");
+
+    // 2. Kiểm tra: Chưa đăng nhập HOẶC Không phải Admin -> Đuổi về
+    if(!token || !user || user.role !== 'admin') {
+        alert("Bạn không có quyền truy cập trang này!");
+        window.location.href = "index.html"; // Đá về trang chủ
+        return;
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("loggedInUser");
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    });
+
+    // 2. Load danh sách chuyến bay
+    loadFlights();
+
+    // 3. Xử lý Form Thêm mới
+    document.getElementById("addFlightForm").addEventListener("submit", async function(e){
+        e.preventDefault();
+
+        const airline = document.getElementById("airline").value;
+        const from = document.getElementById("from").value;
+        const to = document.getElementById("to").value;
+        const startTime = document.getElementById("startTime").value;
+        const price = document.getElementById("price").value;
+
+        // Tính toán giờ đến giả định (Cộng thêm 2 tiếng) để demo
+        const start = new Date(startTime);
+        const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2 hours
+
+        const newFlight = {
+            airline,
+            from,
+            to,
+            startTime,
+            endTime: end.toISOString(), // Backend cần trường này
+            price: Number(price)
+        };
+
+        try {
+            const res = await fetch('http://localhost:5000/api/flights', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'x-auth-token': localStorage.getItem("token") 
+                },
+                body: JSON.stringify(newFlight)
+            });
+            
+            if(res.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                document.getElementById("addFlightForm").reset();
+                loadFlights(); // Tải lại bảng
+            } else {
+                Swal.fire('Lỗi', 'Không thể thêm chuyến bay', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            Swal.fire('Lỗi Server', 'Kiểm tra lại backend', 'error');
+        }
+    });
+
+});
+
+// Hàm lấy dữ liệu và vẽ bảng
+async function loadFlights() {
+    const tbody = document.getElementById("flightTableBody");
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><span class="spinner-border text-primary"></span></td></tr>';
+
+    try {
+        const res = await fetch('http://localhost:5000/api/flights');
+        const data = await res.json(); // Data backend trả về có thể là mảng luôn hoặc {data: []}
+
+        // Xử lý tùy theo cấu trúc trả về của API getFlights cũ
+        let flights = Array.isArray(data) ? data : (data.data || []);
+
+        if(flights.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Chưa có chuyến bay nào.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = flights.map(f => {
+            return `
+                <tr>
+                    <td>
+                        <span class="fw-bold">${f.airline}</span>
+                    </td>
+                    <td>
+                        <div>${f.from} <i class="bi bi-arrow-right-short text-muted"></i> ${f.to}</div>
+                    </td>
+                    <td>
+                        ${new Date(f.startTime).toLocaleString('vi-VN')}
+                    </td>
+                    <td class="text-danger fw-bold">
+                        ${f.price.toLocaleString('vi-VN')}đ
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteFlight('${f._id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Lỗi kết nối Server</td></tr>';
+    }
+}
+
+// Hàm xóa chuyến bay
+async function deleteFlight(id) {
+    const result = await Swal.fire({
+        title: 'Xóa chuyến bay này?',
+        text: "Hành động này không thể hoàn tác!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Xóa ngay'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const res = await fetch(`http://localhost:5000/api/flights/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'x-auth-token': localStorage.getItem("token")
+                }
+            });
+            if(res.ok) {
+                Swal.fire({
+                    icon: 'success', 
+                    title: 'Đã xóa!', 
+                    toast: true, 
+                    position: 'top-end', 
+                    showConfirmButton: false, 
+                    timer: 2000
+                });
+                loadFlights();
+            } else {
+                Swal.fire('Lỗi', 'Không xóa được', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Lỗi', 'Lỗi kết nối', 'error');
+        }
+    }
+}
+</script>
+</body>
+</html>

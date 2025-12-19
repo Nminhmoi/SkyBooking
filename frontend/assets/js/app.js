@@ -26,10 +26,18 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     } else {
       // ĐÃ ĐĂNG NHẬP
+      
+      // Kiểm tra xem có phải admin không?
+      let adminLink = '';
+      if (user.role === 'admin') {
+          adminLink = `<li class="nav-item"><a class="nav-link text-danger fw-bold" href="admin.html">QUẢN TRỊ</a></li>`;
+      }
+
       navRight.innerHTML = `
         <li class="nav-item d-flex align-items-center me-3 text-white">
           Xin chào, <strong class="ms-2">${user.name}</strong>
         </li>
+        ${adminLink}
         <li class="nav-item">
           <a class="nav-link text-warning fw-bold" href="mytickets.html">Vé đã đặt</a>
         </li>
@@ -182,6 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchForm = document.getElementById("searchForm");
   const departInput = document.getElementById("depart");
 
+  // Chặn không cho chọn ngày quá khứ
   if(departInput) {
     const today = new Date().toISOString().split("T")[0];
     departInput.setAttribute("min", today);
@@ -190,10 +199,32 @@ document.addEventListener("DOMContentLoaded", function () {
   if (searchForm) {
     searchForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      const token = localStorage.getItem("token");
       
+      // 1. Lấy dữ liệu từ ô nhập
+      const from = document.getElementById("from").value.trim();
+      const to = document.getElementById("to").value.trim();
+      const depart = departInput.value;
+      const passengers = document.getElementById("passengers").value || 1;
+
+      // 2. KIỂM TRA LOGIC: Điểm đi và đến trùng nhau?
+      // Dùng toLowerCase() để so sánh không phân biệt hoa thường
+      if (from && to && from.toLowerCase() === to.toLowerCase()) {
+          if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Lộ trình không hợp lệ',
+                  text: 'Điểm đi và Điểm đến không được trùng nhau! Vui lòng chọn lại.',
+                  confirmButtonText: 'Đã hiểu'
+              });
+          } else {
+              alert("Điểm đi và Điểm đến không được trùng nhau!");
+          }
+          return; // Dừng lại, không tìm kiếm nữa
+      }
+
+      // 3. KIỂM TRA ĐĂNG NHẬP (Giữ nguyên logic cũ)
+      const token = localStorage.getItem("token");
       if (!token) {
-        // Dùng Swal đẹp nếu có
         if (typeof Swal !== 'undefined') {
             Swal.fire({
                 icon: 'warning',
@@ -210,11 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      const from = document.getElementById("from").value.trim();
-      const to = document.getElementById("to").value.trim();
-      const depart = departInput.value;
-      const passengers = document.getElementById("passengers").value || 1;
-
+      // 4. Nếu mọi thứ OK -> Chuyển trang
       const query = new URLSearchParams({ from, to, depart, passengers }).toString();
       window.location.href = "search.html?" + query;
     });
