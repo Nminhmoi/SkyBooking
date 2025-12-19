@@ -124,3 +124,67 @@ exports.seedFlights = async (req, res) => {
     res.status(500).json({ message: 'Lỗi khi tạo dữ liệu mẫu', error: err.message });
   }
 };
+
+// @desc    Tạo chuyến bay mới
+// @route   POST /api/flights
+// @access  Private/Admin
+exports.createFlight = async (req, res) => {
+  console.log("-----------------------------------");
+  console.log("ĐANG NHẬN DỮ LIỆU TỪ ADMIN:");
+  console.log(req.body); // In ra xem Frontend gửi cái gì lên
+
+  try {
+    const { airline, from, to, startTime, price } = req.body;
+
+    // 1. Kiểm tra dữ liệu bị thiếu
+    if (!airline || !from || !to || !startTime || !price) {
+      console.log("--> LỖI: Thiếu thông tin bắt buộc!");
+      return res.status(400).json({ message: "Vui lòng điền đủ: Hãng, Từ, Đến, Giờ, Giá" });
+    }
+
+    // 2. Xử lý ngày tháng an toàn
+    // Nếu không gửi endTime thì tự động cộng thêm 2 tiếng từ startTime
+    let start = new Date(startTime);
+    let end = req.body.endTime ? new Date(req.body.endTime) : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    // Kiểm tra xem ngày có hợp lệ không
+    if (isNaN(start.getTime())) {
+      console.log("--> LỖI: Ngày tháng không hợp lệ!");
+      return res.status(400).json({ message: "Định dạng ngày tháng không đúng!" });
+    }
+
+    // 3. Tạo chuyến bay
+    const newFlight = new Flight({
+      airline,
+      from,
+      to,
+      startTime: start,
+      endTime: end,
+      price: Number(price), // Đảm bảo giá là số
+      availableSeats: req.body.availableSeats || 100 // Mặc định 100 ghế
+    });
+
+    const savedFlight = await newFlight.save();
+    
+    console.log("--> THÀNH CÔNG: Đã lưu chuyến bay ID:", savedFlight._id);
+    console.log("-----------------------------------");
+
+    res.status(201).json({ success: true, data: savedFlight });
+
+  } catch (err) {
+    console.error("--> LỖI SERVER CRASH:", err.message); // In lỗi cụ thể ra
+    res.status(500).json({ message: "Lỗi Server: " + err.message });
+  }
+};
+
+// @desc    Xóa chuyến bay
+// @route   DELETE /api/flights/:id
+// @access  Private/Admin
+exports.deleteFlight = async (req, res) => {
+  try {
+    await Flight.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: "Đã xóa chuyến bay" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
