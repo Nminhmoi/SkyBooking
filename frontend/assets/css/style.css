@@ -374,7 +374,7 @@ footer .text-center {
 .route-image img {
   width: 100%;
   height: 320px;   /* làm ảnh dài */
-  object-fit: cover;
+  object-fit: center;
   border-radius: 18px;
   box-shadow: 0 12px 30px rgba(0,0,0,.15);
 }
