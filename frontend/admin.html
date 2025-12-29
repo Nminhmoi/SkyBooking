@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function(){
         };
 
         try {
-            const res = await fetch('http://localhost:5000/api/flights', {
+            const res = await fetch('https://skybooking.onrender.com/api/flights', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ async function loadFlights() {
     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><span class="spinner-border text-primary"></span></td></tr>';
 
     try {
-        const res = await fetch('http://localhost:5000/api/flights');
+        const res = await fetch('https://skybooking.onrender.com/api/flights');
         const data = await res.json(); // Data backend trả về có thể là mảng luôn hoặc {data: []}
 
         // Xử lý tùy theo cấu trúc trả về của API getFlights cũ
@@ -237,7 +237,7 @@ async function deleteFlight(id) {
 
     if (result.isConfirmed) {
         try {
-            const res = await fetch(`http://localhost:5000/api/flights/${id}`, {
+            const res = await fetch(`https://skybooking.onrender.com/api/flights/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'x-auth-token': localStorage.getItem("token")

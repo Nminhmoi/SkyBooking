@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async function(){
   const ticketListEl = document.getElementById("ticketList");
 
   try {
-    const res = await fetch('http://localhost:5000/api/bookings/my-tickets', {
+    const res = await fetch('https://skybooking.onrender.com/api/bookings/my-tickets', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

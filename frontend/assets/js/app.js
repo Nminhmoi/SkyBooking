@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
   async function loadReviews() {
     if (!reviewListEl) return;
     try {
-      const res = await fetch('http://localhost:5000/api/reviews');
+      const res = await fetch('https://skybooking.onrender.com/api/reviews');
       const data = await res.json();
 
       if (data.success) {
@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const comment = document.getElementById("commentInput").value;
 
       try {
-        const res = await fetch('http://localhost:5000/api/reviews', {
+        const res = await fetch('https://skybooking.onrender.com/api/reviews', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -385,7 +385,7 @@ window.deleteReview = async function(reviewId) {
 
   const token = localStorage.getItem("token");
   try {
-      const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+      const res = await fetch(`https://skybooking.onrender.com/api/reviews/${reviewId}`, {
           method: 'DELETE',
           headers: { 'x-auth-token': token }
       });

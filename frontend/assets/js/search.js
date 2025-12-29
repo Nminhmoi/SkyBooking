@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    let apiUrl = `http://localhost:5000/api/flights?`;
+    let apiUrl = `https://skybooking.onrender.com/api/flights?`;
     if (from) apiUrl += `from=${from}&`;
     if (to) apiUrl += `to=${to}&`;
     if (depart) apiUrl += `date=${depart}`;
