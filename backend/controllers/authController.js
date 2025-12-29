@@ -1,16 +1,17 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Hàm tạo Token (dùng chung cho cả Register và Login)
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d' // Token hết hạn sau 30 ngày
+// --- 1. SỬA HÀM NÀY: Nhận thêm 'role' để đóng gói vào Token ---
+const signToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
+    expiresIn: '3d' // Token hết hạn sau 3 ngày
   });
 };
 
 // Hàm gửi phản hồi Token về client
 const sendTokenResponse = (user, statusCode, res) => {
-  const token = signToken(user._id);
+  // Truyền cả id và role vào hàm ký tên
+  const token = signToken(user._id, user.role);
 
   // Loại bỏ mật khẩu khỏi dữ liệu trả về client để bảo mật
   user.password = undefined;
@@ -22,7 +23,7 @@ const sendTokenResponse = (user, statusCode, res) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role // Gửi role về frontend
     }
   });
 };
@@ -40,8 +41,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Email này đã được đăng ký!' });
     }
 
-    // 2. Tạo user mới (Password sẽ tự động mã hóa nhờ middleware trong Model)
-    // Lưu ý: Chỉ cho phép tạo role 'admin' nếu cần thiết, thực tế nên chặn ở đây hoặc dùng secret key khác
+    // 2. Tạo user mới
     const user = await User.create({
       name,
       email,
@@ -53,6 +53,7 @@ exports.register = async (req, res) => {
     sendTokenResponse(user, 201, res);
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Lỗi Server', error: err.message });
   }
 };
@@ -69,25 +70,25 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Vui lòng nhập email và mật khẩu' });
     }
 
-    // 2. Tìm user trong DB
-    // Lưu ý: Cần .select('+password') vì trong Model ta để select: false
+    // 2. Tìm user trong DB (Lấy cả password để so sánh)
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
     }
 
-    // 3. Kiểm tra mật khẩu (dùng method matchPassword đã viết trong Model)
+    // 3. Kiểm tra mật khẩu
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Email hoặc mật khẩu không đúng' });
     }
 
-    // 4. Nếu đúng hết -> Trả về token
+    // 4. Nếu đúng hết -> Trả về token (đã bao gồm role nhờ hàm sendTokenResponse ở trên)
     sendTokenResponse(user, 200, res);
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Lỗi Server', error: err.message });
   }
 };

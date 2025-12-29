@@ -23,24 +23,38 @@ const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) +
 // @desc    Lấy danh sách chuyến bay (Có lọc)
 // @route   GET /api/flights
 // @access  Public
+// backend/controllers/flightController.js
+
 exports.getFlights = async (req, res) => {
   try {
     const { from, to, date } = req.query;
+    
+    // Debug: Xem Frontend gửi cái gì lên
+    console.log("🔍 ĐANG TÌM KIẾM:");
+    console.log(" - Nơi đi:", from);
+    console.log(" - Nơi đến:", to);
+    console.log(" - Ngày:", date);
+
     let query = {};
 
-    if (from) query.from = { $regex: from, $options: 'i' };
+    // Logic tìm kiếm
+    if (from) query.from = { $regex: from, $options: 'i' }; 
     if (to) query.to = { $regex: to, $options: 'i' };
 
     if (date) {
       const searchDate = new Date(date);
-      const nextDay = new Date(date);
-      nextDay.setDate(nextDay.getDate() + 1);
-      query.startTime = { $gte: searchDate, $lt: nextDay };
+      if (!isNaN(searchDate)) {
+          const nextDay = new Date(date);
+          nextDay.setDate(nextDay.getDate() + 1);
+          query.startTime = { $gte: searchDate, $lt: nextDay };
+      }
     }
 
-    query.availableSeats = { $gt: 0 };
-    
+    console.log("⚙️ Query gửi vào MongoDB:", JSON.stringify(query));
+
     const flights = await Flight.find(query).sort({ startTime: 1 });
+    
+    console.log(`✅ KẾT QUẢ: Tìm thấy ${flights.length} chuyến bay.`);
 
     res.status(200).json({
       success: true,
@@ -48,10 +62,10 @@ exports.getFlights = async (req, res) => {
       data: flights
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Lỗi Server', error: err.message });
   }
 };
-
 // @desc    Tạo 100 chuyến bay ngẫu nhiên (SEED DATA)
 // @route   POST /api/flights/seed
 // @access  Public
@@ -82,11 +96,10 @@ exports.seedFlights = async (req, res) => {
       while (isDuplicate) {
         flightNumber = `${airlineData.code}${randomNumber(100, 999)}`;
         if (!usedFlightNumbers.has(flightNumber)) {
-          usedFlightNumbers.add(flightNumber); // Đánh dấu đã dùng
-          isDuplicate = false; // Thoát vòng lặp
+          usedFlightNumbers.add(flightNumber);
+          isDuplicate = false;
         }
       }
-      // -------------------------------------------------
 
       const today = new Date();
       const randomDays = randomNumber(0, 30);
@@ -131,7 +144,7 @@ exports.seedFlights = async (req, res) => {
 exports.createFlight = async (req, res) => {
   console.log("-----------------------------------");
   console.log("ĐANG NHẬN DỮ LIỆU TỪ ADMIN:");
-  console.log(req.body); // In ra xem Frontend gửi cái gì lên
+  console.log(req.body); 
 
   try {
     const { airline, from, to, startTime, price } = req.body;
@@ -143,36 +156,51 @@ exports.createFlight = async (req, res) => {
     }
 
     // 2. Xử lý ngày tháng an toàn
-    // Nếu không gửi endTime thì tự động cộng thêm 2 tiếng từ startTime
     let start = new Date(startTime);
     let end = req.body.endTime ? new Date(req.body.endTime) : new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
-    // Kiểm tra xem ngày có hợp lệ không
     if (isNaN(start.getTime())) {
       console.log("--> LỖI: Ngày tháng không hợp lệ!");
       return res.status(400).json({ message: "Định dạng ngày tháng không đúng!" });
     }
 
-    // 3. Tạo chuyến bay
+    // --- 3. TỰ ĐỘNG SINH MÃ CHUYẾN BAY (SỬA LỖI CRASH Ở ĐÂY) ---
+    // Tìm mã hãng (Ví dụ: Vietnam Airlines -> VN)
+    // Biến 'airlines' đã được khai báo ở đầu file của bạn
+    const foundAirline = airlines.find(a => a.name === airline);
+    const airlineCode = foundAirline ? foundAirline.code : "SKY"; // Nếu không tìm thấy thì để mặc định SKY
+    
+    // Tạo số ngẫu nhiên 3-4 chữ số
+    const randomNum = Math.floor(Math.random() * 9000) + 1000;
+    const autoFlightNumber = `${airlineCode}${randomNum}`; // Kết quả: VN1234
+    // -----------------------------------------------------------
+
     const newFlight = new Flight({
+      flightNumber: autoFlightNumber, // <--- QUAN TRỌNG NHẤT: Phải có dòng này
       airline,
       from,
       to,
       startTime: start,
       endTime: end,
-      price: Number(price), // Đảm bảo giá là số
-      availableSeats: req.body.availableSeats || 100 // Mặc định 100 ghế
+      price: Number(price),
+      availableSeats: req.body.availableSeats || 100
     });
 
     const savedFlight = await newFlight.save();
     
-    console.log("--> THÀNH CÔNG: Đã lưu chuyến bay ID:", savedFlight._id);
+    console.log("--> THÀNH CÔNG: Đã lưu chuyến bay ID:", savedFlight._id, " | Số hiệu:", autoFlightNumber);
     console.log("-----------------------------------");
 
     res.status(201).json({ success: true, data: savedFlight });
 
   } catch (err) {
-    console.error("--> LỖI SERVER CRASH:", err.message); // In lỗi cụ thể ra
+    console.error("--> LỖI SERVER CRASH:", err.message); 
+    
+    // Nếu vẫn đen đủi bị trùng mã số (tỉ lệ cực thấp), báo lỗi dễ hiểu hơn
+    if (err.code === 11000) {
+        return res.status(400).json({ message: "Lỗi trùng lặp dữ liệu (Số hiệu chuyến bay bị trùng), vui lòng thử lại!" });
+    }
+    
     res.status(500).json({ message: "Lỗi Server: " + err.message });
   }
 };
