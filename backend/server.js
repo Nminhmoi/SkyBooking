@@ -34,7 +34,6 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // --- ROUTES ---
-// Đảm bảo tên file trong thư mục routes khớp với tên require bên dưới
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bookings', require('./routes/booking')); 
 app.use('/api/flights', require('./routes/flights'));
