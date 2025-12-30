@@ -10,8 +10,7 @@ module.exports = function(req, res, next) {
   }
 
   // Debug: Xem Token có đến nơi không
-  console.log("---------------------------------------");
-  console.log("🔑 AUTH DEBUG:");
+  console.log("AUTH DEBUG:");
   console.log("Token nhận được:", token ? "Có (Đang giải mã...)" : "KHÔNG CÓ");
 
   // 2. Nếu không có token
@@ -23,9 +22,8 @@ module.exports = function(req, res, next) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    console.log("🔓 Nội dung Token đã giải mã:", decoded);
+    console.log("Nội dung Token đã giải mã:", decoded);
 
-    // --- ĐOẠN QUAN TRỌNG: TỰ ĐỘNG NHẬN DIỆN CẤU TRÚC ---
     if (decoded.user) {
         // Trường hợp 1: Token lồng nhau { user: { id: ..., role: ... } }
         req.user = decoded.user;
@@ -35,11 +33,10 @@ module.exports = function(req, res, next) {
         req.user = decoded;
         console.log("=> Đã gán req.user = decoded (Dạng phẳng)");
     }
-    // ----------------------------------------------------
 
     next();
   } catch (err) {
-    console.error("❌ Lỗi giải mã Token:", err.message);
+    console.error("Lỗi giải mã Token:", err.message);
     res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn!' });
   }
 };

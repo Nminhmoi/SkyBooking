@@ -1,4 +1,3 @@
-// middleware/validation.js
 exports.validateFlight = (req, res, next) => {
     const { airline, from, to, startTime, price } = req.body;
 

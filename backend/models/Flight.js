@@ -6,7 +6,7 @@ const FlightSchema = new mongoose.Schema({
   from: { type: String, required: true },
   to: { type: String, required: true },
   startTime: { type: Date, required: true },
-  endTime: { type: Date, required: true }, // Bắt buộc phải có
+  endTime: { type: Date, required: true },
   price: { type: Number, required: true }
 });
 

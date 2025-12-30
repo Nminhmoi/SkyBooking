@@ -51,7 +51,7 @@ exports.deleteReview = async (req, res) => {
     }
 
     // Kiểm tra quyền: ID người login (req.user.id) CÓ TRÙNG VỚI ID người viết (review.user) không?
-    // Lưu ý: review.user là ObjectId nên cần convert sang String để so sánh
+    //review.user là ObjectId nên cần convert sang String để so sánh
     if (review.user.toString() !== req.user.id) {
       return res.status(401).json({ message: 'Bạn không có quyền xóa bình luận này!' });
     }

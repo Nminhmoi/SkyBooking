@@ -1,4 +1,3 @@
-// middleware/logger.js
 const logger = (req, res, next) => {
     const time = new Date().toLocaleString('vi-VN');
     const method = req.method; // GET, POST...

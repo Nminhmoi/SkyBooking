@@ -19,7 +19,7 @@ const app = express();
 
 // --- MIDDLEWARES CƠ BẢN ---
 app.use(express.json()); // Đọc dữ liệu JSON
-app.use(cors()); // Cho phép Frontend (127.0.0.1:5500) gọi API
+app.use(cors()); // Cho phép Frontend gọi API
 
 // --- MIDDLEWARES BẢO MẬT ---
 app.use(helmet());
@@ -33,7 +33,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// --- ROUTES ---
+//ROUTES
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bookings', require('./routes/booking')); 
 app.use('/api/flights', require('./routes/flights'));

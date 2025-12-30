@@ -17,10 +17,9 @@ const BookingSchema = new mongoose.Schema({
       age: { type: Number, required: true }
     }
   ],
-  // --- THÊM 2 DÒNG NÀY ---
   bookingCode: { 
     type: String, 
-    default: '' // Lưu mã SKY... ví dụ: SKY8839
+    default: '' // Lưu mã SKY(mã chuyến bay)
   },
   status: {
     type: String,

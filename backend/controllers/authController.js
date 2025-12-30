@@ -1,10 +1,10 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// --- 1. SỬA HÀM NÀY: Nhận thêm 'role' để đóng gói vào Token ---
+//Nhận thêm 'role' để đóng gói vào Token
 const signToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: '3d' // Token hết hạn sau 3 ngày
+    expiresIn: '3d'
   });
 };
 

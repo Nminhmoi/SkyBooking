@@ -1,5 +1,5 @@
 module.exports = (req, res, next) => {
-  console.log("🔍 DEBUG CHECK ROLE:");
+  console.log("DEBUG CHECK ROLE:");
   console.log("Dữ liệu User nhận được từ Auth:", req.user);
   console.log("Role đang check:", req.user ? req.user.role : "Không tìm thấy role");
 

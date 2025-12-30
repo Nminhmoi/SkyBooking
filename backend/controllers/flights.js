@@ -30,7 +30,7 @@ exports.getFlights = async (req, res) => {
     const { from, to, date } = req.query;
     
     // Debug: Xem Frontend gửi cái gì lên
-    console.log("🔍 ĐANG TÌM KIẾM:");
+    console.log(" ĐANG TÌM KIẾM:");
     console.log(" - Nơi đi:", from);
     console.log(" - Nơi đến:", to);
     console.log(" - Ngày:", date);
@@ -54,7 +54,7 @@ exports.getFlights = async (req, res) => {
 
     const flights = await Flight.find(query).sort({ startTime: 1 });
     
-    console.log(`✅ KẾT QUẢ: Tìm thấy ${flights.length} chuyến bay.`);
+    console.log(`KẾT QUẢ: Tìm thấy ${flights.length} chuyến bay.`);
 
     res.status(200).json({
       success: true,
@@ -88,11 +88,11 @@ exports.seedFlights = async (req, res) => {
 
       const airlineData = random(airlines);
 
-      // --- SỬA LỖI TRÙNG LẶP (DUPLICATE KEY) TẠI ĐÂY ---
+      //SỬA LỖI TRÙNG LẶP MÃ CHUYẾN BAY
       let flightNumber;
       let isDuplicate = true;
       
-      // Vòng lặp: Nếu trùng thì random lại, đến khi nào không trùng thì thôi
+      //Nếu trùng thì random lại, đến khi nào không trùng thì thôi
       while (isDuplicate) {
         flightNumber = `${airlineData.code}${randomNumber(100, 999)}`;
         if (!usedFlightNumbers.has(flightNumber)) {
@@ -142,7 +142,6 @@ exports.seedFlights = async (req, res) => {
 // @route   POST /api/flights
 // @access  Private/Admin
 exports.createFlight = async (req, res) => {
-  console.log("-----------------------------------");
   console.log("ĐANG NHẬN DỮ LIỆU TỪ ADMIN:");
   console.log(req.body); 
 
@@ -164,7 +163,7 @@ exports.createFlight = async (req, res) => {
       return res.status(400).json({ message: "Định dạng ngày tháng không đúng!" });
     }
 
-    // --- 3. TỰ ĐỘNG SINH MÃ CHUYẾN BAY (SỬA LỖI CRASH Ở ĐÂY) ---
+    //3. TỰ ĐỘNG SINH MÃ CHUYẾN BAY
     // Tìm mã hãng (Ví dụ: Vietnam Airlines -> VN)
     // Biến 'airlines' đã được khai báo ở đầu file của bạn
     const foundAirline = airlines.find(a => a.name === airline);
@@ -176,7 +175,7 @@ exports.createFlight = async (req, res) => {
     // -----------------------------------------------------------
 
     const newFlight = new Flight({
-      flightNumber: autoFlightNumber, // <--- QUAN TRỌNG NHẤT: Phải có dòng này
+      flightNumber: autoFlightNumber,
       airline,
       from,
       to,
@@ -189,7 +188,6 @@ exports.createFlight = async (req, res) => {
     const savedFlight = await newFlight.save();
     
     console.log("--> THÀNH CÔNG: Đã lưu chuyến bay ID:", savedFlight._id, " | Số hiệu:", autoFlightNumber);
-    console.log("-----------------------------------");
 
     res.status(201).json({ success: true, data: savedFlight });
 
