@@ -101,10 +101,17 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function(){
-    
+
+    // Chặn chọn thời gian quá khứ
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    const minDateTime = now.toISOString().slice(0,16);
+    document.getElementById("startTime").min = minDateTime;
+
     // 1. Lấy thông tin User
     const user = JSON.parse(localStorage.getItem("loggedInUser") || "null");
     const token = localStorage.getItem("token");
+
 
     // 2. Kiểm tra: Chưa đăng nhập HOẶC Không phải Admin -> Đuổi về
     if(!token || !user || user.role !== 'admin') {
@@ -222,6 +229,7 @@ async function loadFlights() {
     } catch (err) {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Lỗi kết nối Server</td></tr>';
     }
+    
 }
 
 // Hàm xóa chuyến bay

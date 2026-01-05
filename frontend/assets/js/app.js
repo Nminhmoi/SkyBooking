@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-  /* =====================================================
+  /*
      1. ƯU TIÊN SỐ 1: VẼ NAVBAR (MENU) TRƯỚC
      (Để dù code dưới có lỗi thì menu vẫn hiện)
-  ===================================================== */
+*/
   
   // Hàm lấy user an toàn
   function getLoggedUser() {
@@ -76,10 +76,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  /* =====================================================
+  /* 
      2. CẤU HÌNH THÔNG BÁO (SWEETALERT)
      (Để trong try-catch để an toàn)
-  ===================================================== */
+  */
   let Toast = null;
   try {
       if (typeof Swal !== 'undefined') {
@@ -113,9 +113,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  /* =====================================================
+  /*
      3. AUTOCOMPLETE (GỢI Ý SÂN BAY)
-  ===================================================== */
+  */
   const airports = [
     { code: "HAN", name: "Sân bay Nội Bài", city: "Hà Nội" },
     { code: "SGN", name: "Sân bay Tân Sơn Nhất", city: "TP HCM" },
@@ -184,9 +184,9 @@ document.addEventListener("DOMContentLoaded", function () {
   setupAutocomplete("to", "suggestions-to");
 
 
-  /* =====================================================
+  /*
      4. XỬ LÝ FORM TÌM KIẾM
-  ===================================================== */
+  */
   const searchForm = document.getElementById("searchForm");
   const departInput = document.getElementById("depart");
 
@@ -248,9 +248,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
-  /* =====================================================
+  /*
      5. TÍNH NĂNG BÌNH LUẬN (REVIEWS)
-  ===================================================== */
+  */
   const reviewListEl = document.getElementById("reviewList");
   const reviewFormContainer = document.getElementById("reviewFormContainer");
   const loginWarning = document.getElementById("loginWarning");
@@ -363,9 +363,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-/* =====================================================
+/*
    6. HÀM XÓA REVIEW (Toàn cục)
-===================================================== */
+*/
 window.deleteReview = async function(reviewId) {
   // Check nếu có Swal thì dùng, ko thì dùng confirm thường
   if (typeof Swal !== 'undefined') {

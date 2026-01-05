@@ -56,15 +56,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (to) apiUrl += `to=${to}&`;
     if (depart) apiUrl += `date=${depart}`;
 
-    // --- SỬA ĐOẠN NÀY: THÊM HEADERS ---
+    // THÊM HEADERS ---
     const res = await fetch(apiUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'x-auth-token': token // <--- QUAN TRỌNG: Gửi token lên server
+            'x-auth-token': token //Gửi token lên server
         }
     });
-    // ----------------------------------
+    //
 
     if (res.status === 401) {
         alert("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
