@@ -51,6 +51,16 @@
                                 <input type="text" id="to" class="form-control" placeholder="VD: TP HCM" required>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Mã chuyến bay</label>
+                                <input type="text" id="flightCode" class="form-control" placeholder="VD: VN123" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Tổng số ghế</label>
+                                <input type="number" id="seats" class="form-control" placeholder="VD: 150" required>
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Thời gian khởi hành</label>
                             <input type="datetime-local" id="startTime" class="form-control" required>
@@ -78,13 +88,13 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0 align-middle">
-                            <thead class="table-light">
+                           <thead class="table-light">
                                 <tr>
-                                    <th>Hãng</th>
-                                    <th>Hành trình</th>
-                                    <th>Giờ bay</th>
-                                    <th>Giá vé</th>
-                                    <th class="text-end">Hành động</th>
+                                <th>Mã CB</th> <th>Hãng</th>
+                                <th>Hành trình</th>
+                                <th>Ghế (Trống/Tổng)</th> <th>Giờ bay</th>
+                                <th>Giá vé</th>
+                                <th class="text-end">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody id="flightTableBody">
@@ -132,29 +142,36 @@ document.addEventListener("DOMContentLoaded", function(){
 
     // 3. Xử lý Form Thêm mới
     document.getElementById("addFlightForm").addEventListener("submit", async function(e){
-        e.preventDefault();
+    e.preventDefault();
 
-        const airline = document.getElementById("airline").value;
-        const from = document.getElementById("from").value;
-        const to = document.getElementById("to").value;
-        const startTime = document.getElementById("startTime").value;
-        const price = document.getElementById("price").value;
+    // 1. Lấy thêm dữ liệu từ 2 ô mới thêm
+    const airline = document.getElementById("airline").value;
+    const flightCode = document.getElementById("flightCode").value; // Mới
+    const seats = document.getElementById("seats").value;           // Mới
+    const from = document.getElementById("from").value;
+    const to = document.getElementById("to").value;
+    const startTime = document.getElementById("startTime").value;
+    const price = document.getElementById("price").value;
 
-        // Tính toán giờ đến giả định (Cộng thêm 2 tiếng) để demo
-        const start = new Date(startTime);
-        const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2 hours
+    const start = new Date(startTime);
+    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+    
 
-        const newFlight = {
-            airline,
-            from,
-            to,
-            startTime,
-            endTime: end.toISOString(), // Backend cần trường này
-            price: Number(price)
-        };
+    // 2. Bổ sung vào object gửi đi
+    const newFlight = {
+        airline,
+        flightCode,     // Gửi mã chuyến bay lên server
+        seats: Number(seats), // Gửi số ghế (nhớ chuyển sang số)
+        availableSeats: Number(seats), // Ban đầu ghế trống = tổng số ghế
+        from,
+        to,
+        startTime,
+        endTime: end.toISOString(),
+        price: Number(price)
+    };
 
         try {
-            const res = await fetch('https://skybooking.onrender.com/api/flights', {
+            const res = await fetch('https://skybooking.onrender.com/api/flights/', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -202,28 +219,33 @@ async function loadFlights() {
             return;
         }
 
-        tbody.innerHTML = flights.map(f => {
-            return `
-                <tr>
-                    <td>
-                        <span class="fw-bold">${f.airline}</span>
-                    </td>
-                    <td>
-                        <div>${f.from} <i class="bi bi-arrow-right-short text-muted"></i> ${f.to}</div>
-                    </td>
-                    <td>
-                        ${new Date(f.startTime).toLocaleString('vi-VN')}
-                    </td>
-                    <td class="text-danger fw-bold">
-                        ${f.price.toLocaleString('vi-VN')}đ
-                    </td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteFlight('${f._id}')">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+            tbody.innerHTML = flights.map(f => {
+    // Kiểm tra nếu undefined thì hiện dấu gạch ngang
+            const displayCode = f.flightCode ? f.flightCode : '---'; 
+            const displaySeats = f.seats ? `${f.availableSeats}/${f.seats}` : '---';
+
+    return `
+        <tr>
+            <td><span class="badge bg-secondary">${displayCode}</span></td>
+            
+            <td><span class="fw-bold">${f.airline}</span></td>
+            
+            <td>
+                <div>${f.from} <i class="bi bi-arrow-right-short text-muted"></i> ${f.to}</div>
+            </td>
+            
+            <td>${displaySeats} ghế</td>
+
+            <td>${new Date(f.startTime).toLocaleString('vi-VN')}</td>
+            <td class="text-danger fw-bold">${f.price.toLocaleString('vi-VN')}đ</td>
+            
+            <td class="text-end">
+                <button class="btn btn-sm btn-outline-danger border-0" onclick="deleteFlight('${f._id}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `       ;
         }).join('');
 
     } catch (err) {

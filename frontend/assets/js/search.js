@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="card flight-card p-3 mb-3 shadow-sm">
           <div class="row align-items-center">
             <div class="col-md-6">
-              <div class="airline fw-bold text-primary">${f.airline} <small class="text-dark">(${f.flightNumber})</small></div>
+              <div class="airline fw-bold text-primary">${f.airline} <small class="text-dark">(${f.flightCode})</small></div>
               <div class="fw-bold">${f.from} → ${f.to}</div>
               <div class="text-muted small">
                  Đi: ${formatDate(f.startTime)} <br>
