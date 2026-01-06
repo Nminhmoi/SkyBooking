@@ -5,21 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Đăng ký - SkyBook</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="bg-light">
+<body class="auth-body">
 
 <div class="auth-card">
-  <h3>Đăng ký</h3>
+  <div class="mb-4 text-primary" style="font-size: 3rem;">
+    <i class="fa-solid fa-user-plus"></i>
+  </div>
+
+  <h3>Tạo tài khoản</h3>
+  <p class="text-muted small mb-4">Trở thành thành viên để nhận ưu đãi bay</p>
+
   <form id="registerForm">
-    <input type="text" id="name" placeholder="Họ và tên" required class="mb-3 form-control">
-    <input type="email" id="email" placeholder="Email" required class="mb-3 form-control">
-    <input type="password" id="password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required class="mb-3 form-control">
-    <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="name" placeholder="Họ và tên" required>
+      <label for="name">Họ và tên</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="email" class="form-control" id="email" placeholder="Email" required>
+      <label for="email">Email</label>
+    </div>
+
+    <div class="form-floating mb-3">
+      <input type="password" class="form-control" id="password" placeholder="Mật khẩu" required>
+      <label for="password">Mật khẩu (min 6 ký tự)</label>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100">Đăng ký thành viên</button>
   </form>
-  <p>Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+
+  <p class="mt-4">Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
+  <div class="mt-2">
+      <a href="index.html" class="text-secondary small"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="assets/js/app.js"></script>
 <script>
 document.getElementById("registerForm").addEventListener("submit", async function(e){
   e.preventDefault();
@@ -27,6 +52,11 @@ document.getElementById("registerForm").addEventListener("submit", async functio
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
+  
+  // UX: Disable button khi đang gửi
+  const btn = document.querySelector("button[type='submit']");
+  btn.disabled = true;
+  btn.innerText = "Đang đăng ký...";
 
   try {
     const res = await fetch('https://skybooking.onrender.com/api/auth/register', {
@@ -38,34 +68,34 @@ document.getElementById("registerForm").addEventListener("submit", async functio
     const data = await res.json();
 
     if (data.success) {
-      // Lưu token vào máy
       localStorage.setItem("token", data.token);
       localStorage.setItem("loggedInUser", JSON.stringify(data.data));
       
       Swal.fire({
         icon: 'success',
-        title: 'Đăng ký thành công!',
-        text: 'Chào mừng đến với SkyBook',
-        timer: 2000,
-        showConfirmButton: false,
-        timerProgressBar: true
+        title: 'Chào mừng!',
+        text: 'Đăng ký thành công.',
+        timer: 1500,
+        showConfirmButton: false
       }).then(() => {
         window.location.href = "index.html";
       });
     } else {
       Swal.fire({
         icon: 'error',
-        title: 'Đăng ký thất bại',
+        title: 'Thất bại',
         text: data.message || 'Vui lòng thử lại.'
       });
+      btn.disabled = false;
+      btn.innerText = "Đăng ký thành viên";
     }
   } catch (err) {
     console.error(err);
     alert("Lỗi kết nối Server!");
+    btn.disabled = false;
+    btn.innerText = "Đăng ký thành viên";
   }
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="assets/js/app.js"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /*
      1. ƯU TIÊN SỐ 1: VẼ NAVBAR (MENU) TRƯỚC
-     (Để dù code dưới có lỗi thì menu vẫn hiện)
+   
 */
   
   // Hàm lấy user an toàn
