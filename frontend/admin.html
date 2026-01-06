@@ -61,9 +61,14 @@
                                 <input type="number" id="seats" class="form-control" placeholder="VD: 150" required>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Thời gian khởi hành</label>
-                            <input type="datetime-local" id="startTime" class="form-control" required>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Thời gian khởi hành</label>
+                                <input type="datetime-local" id="startTime" class="form-control" required>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Thời gian hạ cánh</label> <input type="datetime-local" id="endTime" class="form-control" required>
+                            </div>  
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Giá vé (VND)</label>
@@ -150,11 +155,16 @@ document.addEventListener("DOMContentLoaded", function(){
     const seats = document.getElementById("seats").value;           // Mới
     const from = document.getElementById("from").value;
     const to = document.getElementById("to").value;
-    const startTime = document.getElementById("startTime").value;
     const price = document.getElementById("price").value;
 
-    const start = new Date(startTime);
-    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+    const startTime = document.getElementById("startTime").value;
+const endTime = document.getElementById("endTime").value; // <--- Lấy từ ô nhập
+
+// 1. Kiểm tra logic: Giờ đến phải sau giờ đi
+if (new Date(endTime) <= new Date(startTime)) {
+    Swal.fire('Lỗi', 'Thời gian hạ cánh phải sau thời gian khởi hành!', 'error');
+    return; // Dừng lại không gửi
+}
     
 
     // 2. Bổ sung vào object gửi đi
@@ -166,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function(){
         from,
         to,
         startTime,
-        endTime: end.toISOString(),
+        endTime,
         price: Number(price)
     };
 
