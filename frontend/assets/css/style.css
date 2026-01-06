@@ -9,6 +9,11 @@ body {
   font-family: 'Poppins', sans-serif;
   background-color: #f8f9fa;
   color: #212529;
+
+  /* --- THÊM 3 DÒNG NÀY --- */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Bắt buộc chiều cao body ít nhất bằng 100% màn hình */
 }
 
 /* ================== HERO ================== */
@@ -206,6 +211,7 @@ footer {
   color: #fff;
   padding: 60px 0 30px;
   font-family: 'Arial', sans-serif;
+  margin-top: auto;
 }
 
 footer h5 {
