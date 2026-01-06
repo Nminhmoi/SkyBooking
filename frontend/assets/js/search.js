@@ -74,10 +74,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const data = await res.json();
+
+    flights = Array.isArray(data) ? data : (data.data || []);
     
-    if (data.success) {
-      flights = data.data; // Mảng chuyến bay từ DB
-    }
   } catch (err) {
     console.error("Lỗi fetch:", err);
     resultsEl.innerHTML = `<div class="alert alert-danger">Lỗi kết nối Server!</div>`;
