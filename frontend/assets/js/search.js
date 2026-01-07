@@ -29,22 +29,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
   renderNavbar();
 
+  /* ---------- KHAI BÁO BIẾN PHÂN TRANG ---------- */
+  let currentPage = 1;
+  const itemsPerPage = 5;
+  let currentFlightsList = []; 
+
   /* ---------- LẤY PARAM TỪ URL ---------- */
   const params = new URLSearchParams(location.search);
   const from = params.get("from") || "";
   const to = params.get("to") || "";
-  const depart = params.get("depart") || ""; // Format: YYYY-MM-DD
+  const depart = params.get("depart") || ""; 
   const passengers = Number(params.get("passengers") || 1);
 
   document.getElementById("searchSummary").innerText =
     `${from} → ${to} | Ngày ${depart || "Tất cả"} | ${passengers} hành khách`;
 
   /* ---------- GỌI API BACKEND ---------- */
-  const resultsEl = document.getElementById("results");
   let flights = [];
-  const token = localStorage.getItem("token"); // <--- Lấy token
+  const token = localStorage.getItem("token"); 
 
-  // Nếu vào thẳng trang search.html mà chưa đăng nhập -> Đuổi về login
   if (!token) {
       alert("Vui lòng đăng nhập để xem kết quả!");
       window.location.href = "login.html";
@@ -56,15 +59,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (to) apiUrl += `to=${to}&`;
     if (depart) apiUrl += `date=${depart}`;
 
-    // THÊM HEADERS ---
     const res = await fetch(apiUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'x-auth-token': token //Gửi token lên server
+            'x-auth-token': token
         }
     });
-    //
 
     if (res.status === 401) {
         alert("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
@@ -74,12 +75,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const data = await res.json();
-
     flights = Array.isArray(data) ? data : (data.data || []);
     
   } catch (err) {
     console.error("Lỗi fetch:", err);
-    resultsEl.innerHTML = `<div class="alert alert-danger">Lỗi kết nối Server!</div>`;
+    document.getElementById("results").innerHTML = `<div class="alert alert-danger">Lỗi kết nối Server!</div>`;
     return;
   }
 
@@ -93,17 +93,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     return d.toLocaleDateString('vi-VN') + ' ' + d.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
   }
 
-  /* ---------- RENDER ---------- */
+  /* ---------- RENDER CÓ PHÂN TRANG ---------- */
   function render(list) {
+    const resultsEl = document.getElementById("results");
+    const paginationEl = document.getElementById("pagination");
+
+    // Fix lỗi: Nếu người dùng quên thêm HTML thì không cho chạy tiếp để tránh crash
+    if (!paginationEl) {
+        console.error("LỖI: Chưa có thẻ <ul id='pagination'> trong file HTML!");
+        return;
+    }
+
     resultsEl.innerHTML = "";
+    paginationEl.innerHTML = "";
+
+    // Lưu lại list hiện tại để dùng cho các nút bấm phân trang
+    currentFlightsList = list;
 
     if (list.length === 0) {
       resultsEl.innerHTML = `<div class="alert alert-info">Không tìm thấy chuyến bay nào phù hợp.</div>`;
       return;
     }
 
-    list.forEach(f => {
-      // Tính thời gian bay (giả lập hoặc lấy từ DB nếu có)
+    // 1. TÍNH TOÁN CẮT MẢNG (SLICING)
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedItems = list.slice(startIndex, endIndex);
+
+    // 2. VẼ DANH SÁCH ĐÃ CẮT
+    paginatedItems.forEach(f => {
       const start = new Date(f.startTime);
       const end = new Date(f.endTime);
       const durationMs = end - start;
@@ -114,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="card flight-card p-3 mb-3 shadow-sm">
           <div class="row align-items-center">
             <div class="col-md-6">
-              <div class="airline fw-bold text-primary">${f.airline} <small class="text-dark">(${f.flightCode})</small></div>
+              <div class="airline fw-bold text-primary">${f.airline} <small class="text-dark">(${f.flightCode || ''})</small></div>
               <div class="fw-bold">${f.from} → ${f.to}</div>
               <div class="text-muted small">
                  Đi: ${formatDate(f.startTime)} <br>
@@ -143,7 +161,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
     });
 
-    // Bắt sự kiện nút Đặt vé
+    // 3. VẼ NÚT PHÂN TRANG
+    setupPagination(list.length, paginationEl);
+
+    // 4. GẮN SỰ KIỆN NÚT ĐẶT VÉ
     document.querySelectorAll(".btn-book").forEach(btn => {
       btn.onclick = function() {
         const user = getLoggedUser();
@@ -153,9 +174,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           return;
         }
 
-        // Lưu thông tin chuyến bay đã chọn vào localStorage để trang booking dùng hiển thị
         const flightInfo = {
-          flightId: this.dataset.id, // ID MongoDB
+          flightId: this.dataset.id,
           airline: this.dataset.airline,
           from: this.dataset.from,
           to: this.dataset.to,
@@ -170,20 +190,61 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  /* ---------- HÀM VẼ NÚT PHÂN TRANG ---------- */
+  function setupPagination(totalItems, wrapper) {
+    const pageCount = Math.ceil(totalItems / itemsPerPage);
+    if (pageCount <= 1) return; 
+
+    // Nút Prev
+    let paginationHTML = `
+      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="javascript:void(0)" onclick="changePage(${currentPage - 1})">Trước</a>
+      </li>
+    `;
+
+    // Các nút số trang
+    for (let i = 1; i <= pageCount; i++) {
+        paginationHTML += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="javascript:void(0)" onclick="changePage(${i})">${i}</a>
+          </li>
+        `;
+    }
+
+    // Nút Next
+    paginationHTML += `
+      <li class="page-item ${currentPage === pageCount ? 'disabled' : ''}">
+        <a class="page-link" href="javascript:void(0)" onclick="changePage(${currentPage + 1})">Sau</a>
+      </li>
+    `;
+
+    wrapper.innerHTML = paginationHTML;
+  }
+
+  // Hàm global để nút HTML gọi được
+  window.changePage = function(page) {
+    const pageCount = Math.ceil(currentFlightsList.length / itemsPerPage);
+    if (page < 1 || page > pageCount) return;
+    
+    currentPage = page;
+    render(currentFlightsList); 
+    window.scrollTo(0, 0); 
+  }
+
   // Render lần đầu
   render(flights);
 
-  // Filter (Front-end filtering cho nhanh)
+  /* ---------- FILTER & SORT ---------- */
   const airlineFilter = document.getElementById("airlineFilter");
   const sortPrice = document.getElementById("sortPrice");
   
-  // Render option hãng bay
   const uniqueAirlines = [...new Set(flights.map(f => f.airline))];
   uniqueAirlines.forEach(a => {
     airlineFilter.innerHTML += `<option value="${a}">${a}</option>`;
   });
 
   airlineFilter.onchange = () => {
+    currentPage = 1; 
     let list = flights;
     if (airlineFilter.value) {
       list = list.filter(f => f.airline === airlineFilter.value);
@@ -192,7 +253,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
 
   sortPrice.onchange = () => {
-    let list = [...flights];
+    currentPage = 1; 
+    let list = [...flights]; 
+    if (airlineFilter.value) {
+         list = list.filter(f => f.airline === airlineFilter.value);
+    }
+
     if (sortPrice.value === "asc") {
       list.sort((a, b) => a.price - b.price);
     }
