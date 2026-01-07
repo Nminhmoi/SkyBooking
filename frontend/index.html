@@ -70,18 +70,41 @@
   <div class="promo-wrap">
     <button class="promo-nav prev" aria-label="Prev">‹</button>
     <div class="promo-scroll" id="promoScroll">
-          <!-- nhiều card hơn hoặc rộng hơn để bắt buộc overflow -->
-    <div class="promo-card"><img src="assets/img/anh1.jpg"><h4>Giảm 40% Tết 2025</h4><p>Ưu đãi toàn bộ chuyến bay nội địa.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
-
-    <div class="promo-card"><img src="assets/img/anh2.jpg"><h4>Ưu đãi giáng sinh</h4><p>Giảm đến 35% cho mọi tuyến bay.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
-
-    <div class="promo-card"><img src="assets/img/anh3.jpg"><h4>Bay Có Đôi - Giảm Gấp Bội</h4><p>Giảm 20% khi đặt từ 2 vé khứ hồi trở lên.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
-
-    <div class="promo-card"><img src="assets/img/anh4.jpg"><h4>Đi Càng Đông - Giảm Càng Sâu</h4><p>Giảm đến 25% cho nhóm từ 4 người.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
-
-    <div class="promo-card"><img src="assets/img/anh5.jpg"><h4>Flash Sale</h4><p>Giờ vàng mỗi ngày.</p><a class="btn btn-primary btn-sm" href="#">Xem ngay</a></div>
-
+    <div class="promo-card">
+        <img src="assets/img/anh1.jpg">
+        <h4>Giảm 40% Tết 2026</h4>
+        <p>Ưu đãi toàn bộ chuyến bay nội địa.</p>
+        <a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showPromoFeature()">Xem ngay</a>
     </div>
+
+    <div class="promo-card">
+        <img src="assets/img/anh2.jpg">
+        <h4>Ưu đãi giáng sinh</h4>
+        <p>Giảm đến 35% cho mọi tuyến bay.</p>
+        <a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showPromoFeature()">Xem ngay</a>
+    </div>
+
+    <div class="promo-card">
+        <img src="assets/img/anh3.jpg">
+        <h4>Bay Có Đôi - Giảm Gấp Bội</h4>
+        <p>Giảm 20% khi đặt từ 2 vé khứ hồi trở lên.</p>
+        <a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showPromoFeature()">Xem ngay</a>
+    </div>
+
+    <div class="promo-card">
+        <img src="assets/img/anh4.jpg">
+        <h4>Đi Càng Đông - Giảm Càng Sâu</h4>
+        <p>Giảm đến 25% cho nhóm từ 4 người.</p>
+        <a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showPromoFeature()">Xem ngay</a>
+    </div>
+
+    <div class="promo-card">
+        <img src="assets/img/anh5.jpg">
+        <h4>Flash Sale</h4>
+        <p>Giờ vàng mỗi ngày.</p>
+        <a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showPromoFeature()">Xem ngay</a>
+    </div>
+</div>
     <button class="promo-nav next" aria-label="Next">›</button>
   </div>
 </section>
@@ -324,5 +347,20 @@
     scrollEl.scrollBy({ left: -(360+22), behavior:'smooth' });
   });
 </script>
+
+<script>
+// Hàm hiển thị thông báo tính năng đang phát triển cho Quảng cáo
+function showPromoFeature() {
+    Swal.fire({
+        icon: 'info',
+        title: 'Sắp ra mắt!',
+        text: 'Chương trình khuyến mãi này sẽ được cập nhật chi tiết trong phiên bản tới.',
+        confirmButtonText: 'Đã hiểu',
+        confirmButtonColor: '#0d6efd' // Màu xanh giống theme web
+    });
+}
+</script>
+</body>
+</html>
 </body>
 </html>
